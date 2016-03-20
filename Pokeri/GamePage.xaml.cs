@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -25,6 +26,14 @@ namespace Pokeri
         public GamePage()
         {
             this.InitializeComponent();
+            Deck deck = new Deck();
+            Card card = new Card();
+
+            Debug.WriteLine("Saatana!");
+
+            deck.BuildDeck(card);
+            deck.DebugList();
+
         }
     }
 }

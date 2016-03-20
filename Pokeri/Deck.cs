@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,16 +19,16 @@ namespace Pokeri
 
         public void BuildDeck(Card card)
         {
-            Random rng = new Random();
-            for(int i = 0; i == 51; i++)
+            for(int i = 0;i<4;i++)
             {
-                Card card1 = new Card();
-                int suit = rng.Next(1, 5);
-                int number = rng.Next(1, 14);
-
-
+                for(int v=0;v<14;v++)
+                {
+                    deck.Add(new Card { Suit = i,Number=v});
+                }
             }
 
+
+        }
             /*
             Card card1 = new Card { Suit = 0, Number = 1 };
             deck.Add(card1);
@@ -35,13 +36,20 @@ namespace Pokeri
             deck.Add(card2);
             Card card3 = new Card { Suit = 0, Number = 3 };
             deck.Add(card3);       */ 
-        }
+        
 
         
     public void ScrambleDeck ()
         {
             int i = deck.Count;
                                
+        }
+    public void DebugList ()
+        {
+            foreach (Card card in deck)
+            {
+                Debug.WriteLine(card.Suit + " " + card.Number);
+            }
         }
     }
 }
