@@ -41,6 +41,7 @@ namespace Pokeri
             string Card1Number = Convert.ToString(card1.Number);
 
             debug.Text = Card1Suit + " " + Card1Number;
+            //joudun kirjottaan tämmötteen hienon kommentin että voin puskea tämän tuonne githubiin
             
 
             
