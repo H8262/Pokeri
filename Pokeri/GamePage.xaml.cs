@@ -25,14 +25,26 @@ namespace Pokeri
     {
         public GamePage()
         {
+            Random rand = new Random();
             this.InitializeComponent();
             Deck deck = new Deck();
             Card card = new Card();
 
-            Debug.WriteLine("Saatana!");
 
             deck.BuildDeck(card);
             deck.DebugList();
+            Card card1 = new Card();        
+            deck.ServeCard(card1);
+            deck.DebugList();
+
+            string Card1Suit = Convert.ToString(card1.Suit);
+            string Card1Number = Convert.ToString(card1.Number);
+
+            debug.Text = Card1Suit + " " + Card1Number;
+            
+
+            
+
 
         }
     }
