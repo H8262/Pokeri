@@ -26,8 +26,6 @@ namespace Pokeri
                     deck.Add(new Card { Suit = i,Number=v});
                 }
             }
-
-
         }
         /*
         Card card1 = new Card { Suit = 0, Number = 1 };
@@ -39,12 +37,21 @@ namespace Pokeri
 
         public Card ServeCard(Card card)
         {
-            int i = 0;
-            do
-            {
                 Random random = new Random();
                 int rand1 = random.Next(0, 4);
                 int rand2 = random.Next(0, 13);
+
+                foreach(Card card in deck)
+                {
+                    // kortti tuo arvottu
+                    if (card.Number == rand2 && card.Suit == rand1)
+                    {
+
+                    }
+                }
+
+            /*do
+            {
                 if (deck.Contains(new Card { Suit = rand1, Number = rand2 }))
                 {
                     deck.Remove(new Card { Suit = rand1, Number = rand2 });
@@ -57,7 +64,7 @@ namespace Pokeri
                     return new Card { Suit = 5, Number = 20 };
                 }
             } while (i == 0);
-        }
+        }*/
 
     public void DebugList ()
         {
