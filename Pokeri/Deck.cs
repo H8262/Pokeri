@@ -10,7 +10,7 @@ namespace Pokeri
     class Deck
     {
         List<Card> deck;
-
+        Random random = new Random();
         public Deck()
         {
             deck = new List<Card>();
@@ -35,38 +35,50 @@ namespace Pokeri
         Card card3 = new Card { Suit = 0, Number = 3 };
         deck.Add(card3);       */
 
-        public Card ServeCard(Card card)
+        public Card ServeCard()
         {
-                Random random = new Random();
-                int rand1 = random.Next(0, 4);
-                int rand2 = random.Next(0, 13);
+            /*            
+            int rand1 = random.Next(0, 4);
+            int rand2 = random.Next(0, 13);
+            */
 
-                foreach(Card card in deck)
-                {
-                    // kortti tuo arvottu
-                    if (card.Number == rand2 && card.Suit == rand1)
-                    {
+            int index = random.Next(0, deck.Count);
+            Card card = deck.ElementAt(index);
+            deck.Remove(card);
+            return card;
 
-                    }
-                }
-
-            /*do
+            /*foreach (Card card in deck)
             {
-                if (deck.Contains(new Card { Suit = rand1, Number = rand2 }))
+                // kortti tuo arvottu
+                if (card.Number == rand2 && card.Suit == rand1)
                 {
-                    deck.Remove(new Card { Suit = rand1, Number = rand2 });
-                    Card ServeCard = new Card { Suit = rand1, Number = rand2 };
-                    i = 1;                 
-                    return new Card { Suit = rand1, Number = rand2 };
+                    
+                    Debug.WriteLine("Poistettu " + deck.Count);
+                    Card card111 = new Card { Suit = rand1, Number = rand2 };
+                    return card111;                    
                 }
-                else
-                {
-                    return new Card { Suit = 5, Number = 20 };
-                }
-            } while (i == 0);
-        }*/
+            }
+            return null;
+            */
+        }
 
-    public void DebugList ()
+        /*do
+        {
+            if (deck.Contains(new Card { Suit = rand1, Number = rand2 }))
+            {
+                deck.Remove(new Card { Suit = rand1, Number = rand2 });
+                Card ServeCard = new Card { Suit = rand1, Number = rand2 };
+                i = 1;                 
+                return new Card { Suit = rand1, Number = rand2 };
+            }
+            else
+            {
+                return new Card { Suit = 5, Number = 20 };
+            }
+        } while (i == 0);
+    }*/
+
+        public void DebugList ()
         {
             foreach (Card card in deck)
             {
