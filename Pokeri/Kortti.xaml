@@ -10,10 +10,10 @@
     d:DesignWidth="400">
 
     <Grid>
-        <Rectangle Width ="225" Height="315">
+        <Rectangle Width ="75" Height="105">
             <Rectangle.Fill>
                 <ImageBrush
-                    ImageSource="Assets/kortit.png"
+                    ImageSource="Assets/kortitS3.png"
                     Stretch="None"
                     AlignmentX="Left"
                     AlignmentY="Top"

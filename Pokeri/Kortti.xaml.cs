@@ -25,8 +25,8 @@ namespace Pokeri
 
         public int Suit;
         public int Number;
-        public double frameHeight = 315;
-        public double frameWidth = 225;
+        public double frameHeight = 105;
+        public double frameWidth = 75;
         public Kortti()
         {
             this.InitializeComponent();
