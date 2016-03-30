@@ -41,10 +41,18 @@ namespace Pokeri
             int rand1 = random.Next(0, 4);
             int rand2 = random.Next(0, 13);
             */
+            bool onnistui = true;
 
             int index = random.Next(0, deck.Count);
             Card card = deck.ElementAt(index);
-            deck.Remove(card);
+            
+            onnistui = deck.Remove(card);
+            if(onnistui == false)
+            {
+                ServeCard();
+                Debug.WriteLine("Jako epäonnistui --> uudestaan");
+            }
+            Debug.WriteLine("Jako onnistui " + deck.Count + " " + index);
             return card;
 
             /*foreach (Card card in deck)

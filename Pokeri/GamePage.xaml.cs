@@ -26,6 +26,18 @@ namespace Pokeri
     {
         public Kortti kortti1;
         public Kortti kortti2;
+        public Kortti ai1Card1;
+        public Kortti ai1Card2;
+        public Kortti ai2Card1;
+        public Kortti ai2Card2;
+        public Kortti ai3Card1;
+        public Kortti ai3Card2;
+        public Kortti tableCard1;
+        public Kortti tableCard2;
+        public Kortti tableCard3;
+        public Kortti tableCard4;
+        public Kortti tableCard5;
+
         public GamePage()
         {
             ApplicationView.PreferredLaunchWindowingMode
@@ -87,34 +99,168 @@ namespace Pokeri
             table.AddCard(card11);
             table.AddCard(card12);
             table.AddCard(card13);
-
-
+                   
             kortti1 = new Kortti // lisätään kortti canvakselle
             {
                 Suit = card1.Suit,
                 Number = card1.Number,
-                LocationX = 100,
-                LocationY = 100                        
+                LocationX = 330,
+                LocationY = 450,
+                Hidden = false
             };
 
             kortti2 = new Kortti
             {
                 Suit = card2.Suit,
                 Number = card2.Number,
-                LocationX = 400,
-                LocationY = 100
+                LocationX = 370,
+                LocationY = 450,
+                Hidden = false
+
             };
-            kortti1.UpdateLooks();
-            kortti2.UpdateLooks();
+
+            ai1Card1 = new Kortti
+            {
+                Suit = card3.Suit,
+                Number = card3.Number,
+                LocationX = 70,
+                LocationY = 100,
+                Hidden = true
+            };
+            ai1Card2 = new Kortti
+            {
+                Suit = card4.Suit,
+                Number = card4.Number,
+                LocationX = 110,
+                LocationY = 100,
+                Hidden = true
+            };
+
+            ai2Card1 = new Kortti
+            {
+                Suit = card5.Suit,
+                Number = card5.Number,
+                LocationX = 330,
+                LocationY = 50,
+                Hidden = true
+            };
+            ai2Card2 = new Kortti
+            {
+                Suit = card6.Suit,
+                Number = card6.Number,
+                LocationX = 370,
+                LocationY = 50,
+                Hidden = true
+            };
+            ai3Card1 = new Kortti
+            {
+                Suit = card7.Suit,
+                Number = card7.Number,
+                LocationX = 590,
+                LocationY = 100,
+                Hidden = true
+            };
+            ai3Card2 = new Kortti
+            {
+                Suit = card8.Suit,
+                Number = card8.Number,
+                LocationX = 630,
+                LocationY = 100,
+                Hidden = true
+            };
+            tableCard1 = new Kortti
+            {
+                Suit = card9.Suit,
+                Number = card9.Number,
+                LocationX = 363,
+                LocationY = 248,
+                Hidden = true
+            };
+            tableCard2 = new Kortti
+            {
+                Suit = card10.Suit,
+                Number = card10.Number,
+                LocationX = 283,
+                LocationY = 248,
+                Hidden = true
+            };
+            tableCard3 = new Kortti
+            {
+                Suit = card11.Suit,
+                Number = card11.Number,
+                LocationX = 203,
+                LocationY = 248,
+                Hidden = true
+            };
+            tableCard4 = new Kortti
+            {
+                Suit = card12.Suit,
+                Number = card12.Number,
+                LocationX = 443,
+                LocationY = 248,
+                Hidden = true
+            };
+            tableCard5 = new Kortti
+            {
+                Suit = card13.Suit,
+                Number = card13.Number,
+                LocationX = 523,
+                LocationY = 248,
+                Hidden = true
+            };
 
 
-            kortti1.UpdatePosition();
-            kortti2.UpdatePosition();
 
             MyCanvas.Children.Add(kortti1);
             MyCanvas.Children.Add(kortti2);
+            MyCanvas.Children.Add(ai1Card1);
+            MyCanvas.Children.Add(ai1Card2);
+            MyCanvas.Children.Add(ai2Card1);
+            MyCanvas.Children.Add(ai2Card2);
+            MyCanvas.Children.Add(ai3Card1);
+            MyCanvas.Children.Add(ai3Card2);
+            MyCanvas.Children.Add(tableCard1);
+            MyCanvas.Children.Add(tableCard2);
+            MyCanvas.Children.Add(tableCard3);
+            MyCanvas.Children.Add(tableCard4);
+            MyCanvas.Children.Add(tableCard5);
 
+            foreach (Kortti kortti in MyCanvas.Children)
+            {
+                kortti.UpdateLooks();
+                kortti.UpdatePosition();
+            }
 
+        }
+
+        private void Reveal_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (Kortti kortti in MyCanvas.Children)
+            {
+                kortti.Hidden = false;
+                kortti.UpdateLooks();
+                kortti.UpdatePosition();
+            }
+        }
+
+        private void Hide_Click(object sender, RoutedEventArgs e)
+        {
+            ai1Card1.Hidden = true;
+            ai1Card2.Hidden = true;
+            ai2Card1.Hidden = true;
+            ai2Card2.Hidden = true;
+            ai3Card1.Hidden = true;
+            ai3Card2.Hidden = true;
+            tableCard1.Hidden = true;
+            tableCard2.Hidden = true;
+            tableCard3.Hidden = true;
+            tableCard4.Hidden = true;
+            tableCard5.Hidden = true;
+            foreach (Kortti kortti in MyCanvas.Children)
+            {
+                kortti.UpdateLooks();
+                kortti.UpdatePosition();
+            }
 
         }
     }

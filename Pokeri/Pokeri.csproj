@@ -120,6 +120,7 @@
     <None Include="Pokeri_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\EmptyCard.png" />
     <Content Include="Assets\kortit.png" />
     <Content Include="Assets\kortitS3.png" />
     <Content Include="Properties\Default.rd.xml" />

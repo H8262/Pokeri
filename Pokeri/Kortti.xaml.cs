@@ -23,6 +23,12 @@ namespace Pokeri
         public double LocationX { get; set; }
         public double LocationY { get; set; }
 
+        public bool Hidden // onko kortti piilotettu pelaajalta
+        {
+            get; set;
+        }
+
+
         public int Suit;
         public int Number;
         public double frameHeight = 105;
@@ -38,8 +44,16 @@ namespace Pokeri
         }
         public void UpdateLooks()
         {
-            SpriteSheetOffset.X = Number * -frameWidth;
-            SpriteSheetOffset.Y = Suit * -frameHeight;
+            if (Hidden == false)
+            {
+                SpriteSheetOffset.X = Number * -frameWidth;
+                SpriteSheetOffset.Y = Suit * -frameHeight;
+            }
+            else
+            {
+                SpriteSheetOffset.X = 0;
+                SpriteSheetOffset.Y = -420;
+            }
         }
     }
 }
