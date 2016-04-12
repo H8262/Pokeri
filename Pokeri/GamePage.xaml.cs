@@ -140,7 +140,7 @@ namespace Pokeri
                 Number = card1.Number,
                 LocationX = 330,
                 LocationY = 450,
-                Hidden = false
+                Hidden = true
             };
 
             kortti2 = new Kortti
@@ -149,7 +149,7 @@ namespace Pokeri
                 Number = card2.Number,
                 LocationX = 370,
                 LocationY = 450,
-                Hidden = false
+                Hidden = true
 
             };
 
@@ -259,11 +259,6 @@ namespace Pokeri
             MyCanvas.Children.Add(tableCard4);
             MyCanvas.Children.Add(tableCard5);
 
-            foreach (Kortti kortti in MyCanvas.Children)
-            {
-                kortti.UpdateLooks();
-                kortti.UpdatePosition();
-            }
             UpdateUI();
         }
 
@@ -278,6 +273,7 @@ namespace Pokeri
         }
         public void UpdateUI()
         {
+
             PlayerCash = Convert.ToString(player.Money);
             Ai1Cash = Convert.ToString(ai1.Money);
             Ai2Cash = Convert.ToString(ai2.Money);
@@ -291,6 +287,11 @@ namespace Pokeri
             ai3MoneyGamePage.Text = Ai3Cash + " $";
             tableMoneyGamePage.Text = TableCash + " $";
 
+            foreach (Kortti kortti in MyCanvas.Children)
+            {
+                kortti.UpdateLooks();
+                kortti.UpdatePosition();
+            }
         }
 
         private void Hide_Click(object sender, RoutedEventArgs e)
@@ -316,6 +317,9 @@ namespace Pokeri
 
         public void StartGame_Click(object sender, RoutedEventArgs e)
         {
+            kortti1.Hidden = false;
+            kortti2.Hidden = false;
+
             player.Money -= 50;
             ai1.Money -= 50;
             ai2.Money -= 50;
