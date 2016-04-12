@@ -327,5 +327,5 @@ namespace Pokeri
             tablePlayer.Money += 200;
             UpdateUI();
         }
-    }
+    }// kommentti että voin pushata gittiin
 }
