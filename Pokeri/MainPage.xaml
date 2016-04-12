@@ -9,8 +9,9 @@
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="Welcome"/>
-            <Button x:Name="PlayButton" Content="Play" Margin="10" Click="PlayButton_Click"/>
+            <TextBlock Text="Welcome" Width="100"/>
+            <Button x:Name="PlayButton" Content="Play" Margin="5" Click="PlayButton_Click" Width="100"/>
+            <TextBox x:Name="PlayerName" Text="Player" Margin="5" Width="100"/>
         </StackPanel>
 
     </Grid>

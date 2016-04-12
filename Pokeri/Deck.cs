@@ -21,7 +21,7 @@ namespace Pokeri
         {
             for(int i = 0;i<4;i++)
             {
-                for(int v=0;v<14;v++)
+                for(int v=0;v<13;v++)
                 {
                     deck.Add(new Card { Suit = i,Number=v});
                 }

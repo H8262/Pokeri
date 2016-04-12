@@ -25,11 +25,14 @@ namespace Pokeri
         public MainPage()
         {
             this.InitializeComponent();
+            
         }
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
+            string name = PlayerName.Text;
             this.Frame.Navigate(typeof(GamePage));
+            this.Frame.Navigate(typeof(GamePage), name);
         }
     }
 }

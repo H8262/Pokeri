@@ -28,13 +28,40 @@
         	Click="Reveal_Click"                
            Margin="20"
                 />
-        <Button
+            <Button
             x:Name="Hide"
             Content="Hide"
             Margin="20"
 
             Click="Hide_Click"
             />
+        </StackPanel>
+        <StackPanel Margin="450,450,50,50">
+            <TextBlock x:Name="playerNameGamePage" Text="pohjatekstiä"/>
+            <TextBlock x:Name="playerMoneyGamePage" Text="pohjatekstiä"/>
+            <Button x:Name="StartGame" Content="StartGame" Click="StartGame_Click"/>
+        </StackPanel>
+        <StackPanel Margin="190,100,50,50">
+            <TextBlock x:Name="ai1NameGamePage" Text="AI Player 1"/>
+            <TextBlock x:Name="ai1MoneyGamePage" Text="pohjatekstiä"/>
+        </StackPanel>
+        <StackPanel Margin="460,50,50,50">
+            <TextBlock x:Name="ai2NameGamePage" Text="AI Player 2"/>
+            <TextBlock x:Name="ai2MoneyGamePage" Text="pohjatekstiä"/>
+        </StackPanel>
+        <StackPanel Margin="590,50,50,50">
+            <TextBlock x:Name="ai3NameGamePage" Text="AI Player 2"/>
+            <TextBlock x:Name="ai3MoneyGamePage" Text="pohjatekstiä"/>
+        </StackPanel>
+        <StackPanel Margin="603,248,50,50">
+            <TextBlock x:Name="tableNameGamePage" Text="Table"/>
+            <TextBlock x:Name="tableMoneyGamePage" Text="pohjatekstiä"/>
+        </StackPanel>
+        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
+            <Button x:Name="Call" Content="Call" Margin="10"/>
+            <Button x:Name="Raise" Content="Raise" Margin="10"/>
+            <Button x:Name="AllIn" Content="All In" Margin="10"/>
+            <Button x:Name="Fold" Content="Fold" Margin="10"/>
         </StackPanel>
     </Grid>
 </Page>

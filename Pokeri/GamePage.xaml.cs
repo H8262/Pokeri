@@ -24,6 +24,13 @@ namespace Pokeri
     /// </summary>
     public sealed partial class GamePage : Page
     {
+        string PlayerName;
+        string PlayerCash;
+        string Ai1Cash;
+        string Ai2Cash;
+        string Ai3Cash;
+        string TableCash;
+
         public Kortti kortti1;
         public Kortti kortti2;
         public Kortti ai1Card1;
@@ -37,6 +44,11 @@ namespace Pokeri
         public Kortti tableCard3;
         public Kortti tableCard4;
         public Kortti tableCard5;
+        Player player;
+        Player ai1;
+        Player ai2;
+        Player ai3;
+        Player tablePlayer;
 
         public GamePage()
         {
@@ -44,6 +56,17 @@ namespace Pokeri
                 = ApplicationViewWindowingMode.PreferredLaunchViewSize;
             ApplicationView.PreferredLaunchViewSize = new Size(800, 600);
 
+            player = new Player { Name = "Player", Money = 2000 };
+            ai1 = new Player { Name = "AI Player 1", Money = 2000 };
+            ai2 = new Player { Name = "AI Player 2", Money = 2000 };
+            ai3 = new Player { Name = "AI Player 3", Money = 2000 };
+            tablePlayer = new Player { Name = "Table", Money = 0 };
+
+            PlayerName = player.Name;
+
+            //playerMoneyGamePage.Text = Convert.ToString(player.Money);
+           
+            
             Random rand = new Random();
             this.InitializeComponent();
             Deck deck = new Deck();
@@ -99,7 +122,18 @@ namespace Pokeri
             table.AddCard(card11);
             table.AddCard(card12);
             table.AddCard(card13);
-                   
+
+            Debug.WriteLine("Player hand:");
+            playerHand.ShowHands();
+            Debug.WriteLine("AI1 hand:");
+            ai1Hand.ShowHands();
+            Debug.WriteLine("AI2 hand:");
+            ai2Hand.ShowHands();
+            Debug.WriteLine("AI3 hand:");
+            ai3Hand.ShowHands();
+            Debug.WriteLine("Table hand:");
+            table.ShowHands();
+
             kortti1 = new Kortti // lisätään kortti canvakselle
             {
                 Suit = card1.Suit,
@@ -230,17 +264,33 @@ namespace Pokeri
                 kortti.UpdateLooks();
                 kortti.UpdatePosition();
             }
-
+            UpdateUI();
         }
 
         private void Reveal_Click(object sender, RoutedEventArgs e)
-        {
+        {            
             foreach (Kortti kortti in MyCanvas.Children)
             {
                 kortti.Hidden = false;
                 kortti.UpdateLooks();
                 kortti.UpdatePosition();
             }
+        }
+        public void UpdateUI()
+        {
+            PlayerCash = Convert.ToString(player.Money);
+            Ai1Cash = Convert.ToString(ai1.Money);
+            Ai2Cash = Convert.ToString(ai2.Money);
+            Ai3Cash = Convert.ToString(ai3.Money);
+            TableCash = Convert.ToString(tablePlayer.Money);
+
+            playerNameGamePage.Text = PlayerName;
+            playerMoneyGamePage.Text = PlayerCash + " $";
+            ai1MoneyGamePage.Text = Ai1Cash + " $";
+            ai2MoneyGamePage.Text = Ai2Cash + " $";
+            ai3MoneyGamePage.Text = Ai3Cash + " $";
+            tableMoneyGamePage.Text = TableCash + " $";
+
         }
 
         private void Hide_Click(object sender, RoutedEventArgs e)
@@ -262,6 +312,16 @@ namespace Pokeri
                 kortti.UpdatePosition();
             }
 
+        }
+
+        public void StartGame_Click(object sender, RoutedEventArgs e)
+        {
+            player.Money -= 50;
+            ai1.Money -= 50;
+            ai2.Money -= 50;
+            ai3.Money -= 50;
+            tablePlayer.Money += 200;
+            UpdateUI();
         }
     }
 }
