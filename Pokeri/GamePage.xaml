@@ -42,15 +42,18 @@
             <Button x:Name="StartGame" Content="StartGame" Click="StartGame_Click"/>
         </StackPanel>
         <StackPanel Margin="190,100,50,50">
+            <TextBlock x:Name="ai1ActionTextBlock" Text="Waiting..." />
             <TextBlock x:Name="ai1NameGamePage" Text="AI Player 1"/>
             <TextBlock x:Name="ai1MoneyGamePage" Text="pohjatekstiä"/>
         </StackPanel>
         <StackPanel Margin="460,50,50,50">
+            <TextBlock x:Name="ai2ActionTextBlock" Text="Waiting..."/>
             <TextBlock x:Name="ai2NameGamePage" Text="AI Player 2"/>
             <TextBlock x:Name="ai2MoneyGamePage" Text="pohjatekstiä"/>
         </StackPanel>
-        <StackPanel Margin="590,50,50,50">
-            <TextBlock x:Name="ai3NameGamePage" Text="AI Player 2"/>
+        <StackPanel Margin="590,40,50,50">
+            <TextBlock x:Name="ai3ActionTextBlock" Text="Waiting..."/>
+            <TextBlock x:Name="ai3NameGamePage" Text="AI Player 3"/>
             <TextBlock x:Name="ai3MoneyGamePage" Text="pohjatekstiä"/>
         </StackPanel>
         <StackPanel Margin="603,248,50,50">
@@ -58,8 +61,9 @@
             <TextBlock x:Name="tableMoneyGamePage" Text="pohjatekstiä"/>
         </StackPanel>
         <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right">
-            <Button x:Name="Call" Content="Call" Margin="10"/>
-            <Button x:Name="Raise" Content="Raise" Margin="10"/>
+            <TextBlock x:Name="CallValueTextBlock" Margin="10"/>
+            <Button x:Name="Call" Content="Call" Margin="10" Click="Call_Click" IsEnabled="True"/>
+            <Button x:Name="Raise" Content="Raise" Margin="10" Click="Raise_Click"/>
             <Button x:Name="AllIn" Content="All In" Margin="10"/>
             <Button x:Name="Fold" Content="Fold" Margin="10"/>
         </StackPanel>

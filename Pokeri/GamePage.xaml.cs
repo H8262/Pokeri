@@ -23,13 +23,14 @@ namespace Pokeri
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class GamePage : Page
-    {
+    {        
         string PlayerName;
         string PlayerCash;
         string Ai1Cash;
         string Ai2Cash;
         string Ai3Cash;
         string TableCash;
+        int CallValue = 50; // how much is Call?
 
         public Kortti kortti1;
         public Kortti kortti2;
@@ -50,6 +51,28 @@ namespace Pokeri
         Player ai3;
         Player tablePlayer;
 
+        Hand ai1Hand;
+        Hand ai2Hand;
+        Hand ai3Hand;
+        Hand table;
+
+
+        // timer juttuja
+        private DispatcherTimer timer;
+        private int turnCounter = 0; // what turn is it?
+        private int counter = 0; //whose turn is it?
+
+        //start turn
+        public void StartTurn()
+        {
+            timer = new DispatcherTimer();
+            timer.Tick += Timer_Tick;
+            timer.Interval = new TimeSpan(0, 0, 1);
+            timer.Start();
+
+        }
+        // timer jutut päättyy
+
         public GamePage()
         {
             ApplicationView.PreferredLaunchWindowingMode
@@ -64,21 +87,17 @@ namespace Pokeri
 
             PlayerName = player.Name;
 
-            //playerMoneyGamePage.Text = Convert.ToString(player.Money);
-           
-            
             Random rand = new Random();
             this.InitializeComponent();
             Deck deck = new Deck();
             Card card = new Card();
             Hand playerHand = new Hand(); //pelaajan käsi
-            Hand ai1Hand = new Hand(); // tietokonevastustajien kädet
-            Hand ai2Hand = new Hand();
-            Hand ai3Hand = new Hand();
-            Hand table = new Hand(); // pöydän kortit
+            ai1Hand = new Hand(); // tietokonevastustajien kädet
+            ai2Hand = new Hand();
+            ai3Hand = new Hand();
+            table = new Hand(); // pöydän kortit
 
             deck.BuildDeck(card);
-            deck.DebugList();
             Card card1 = new Card(); // ei kaunis, kehittelen loopin jos aikaa
             Card card2 = new Card();
             Card card3 = new Card();
@@ -243,8 +262,6 @@ namespace Pokeri
                 Hidden = true
             };
 
-
-
             MyCanvas.Children.Add(kortti1);
             MyCanvas.Children.Add(kortti2);
             MyCanvas.Children.Add(ai1Card1);
@@ -260,7 +277,8 @@ namespace Pokeri
             MyCanvas.Children.Add(tableCard5);
 
             UpdateUI();
-        }
+            DisableButtons();
+    }
 
         private void Reveal_Click(object sender, RoutedEventArgs e)
         {            
@@ -286,12 +304,50 @@ namespace Pokeri
             ai2MoneyGamePage.Text = Ai2Cash + " $";
             ai3MoneyGamePage.Text = Ai3Cash + " $";
             tableMoneyGamePage.Text = TableCash + " $";
+            ai1.GetCallValue(CallValue);
+            ai2.GetCallValue(CallValue);
+            ai3.GetCallValue(CallValue);
+            CallValueTextBlock.Text = "Call Value: " + Convert.ToString(CallValue);
 
             foreach (Kortti kortti in MyCanvas.Children)
             {
                 kortti.UpdateLooks();
                 kortti.UpdatePosition();
             }
+
+            switch(ai1.Action)
+            {
+                case 0: ai1ActionTextBlock.Text = "Call!" + CallValue + " $"; break;
+                case 1: ai1ActionTextBlock.Text = "Raise!" + CallValue + " $"; break;
+                case 5: ai1ActionTextBlock.Text = "Waiting..."; break;
+            }
+            switch (ai2.Action)
+            {
+                case 0: ai2ActionTextBlock.Text = "Call!" + CallValue + " $"; break;
+                case 1: ai2ActionTextBlock.Text = "Raise!" + CallValue + " $"; break;
+                case 5: ai2ActionTextBlock.Text = "Waiting..."; break;
+            }
+            switch (ai3.Action)
+            {
+                case 0: ai3ActionTextBlock.Text = "Call!" + CallValue + " $"; break;
+                case 1: ai3ActionTextBlock.Text = "Raise!" + CallValue + " $"; break;
+                case 5: ai3ActionTextBlock.Text = "Waiting..."; break;
+            }
+            if (turnCounter == 5)
+            {
+                tableCard1.Hidden = false;
+                tableCard2.Hidden = false;
+                tableCard3.Hidden = false;
+            }
+            if (turnCounter == 7)
+            {
+                tableCard4.Hidden = false;
+            }
+            if (turnCounter == 8)
+            {
+                tableCard5.Hidden = false;
+            }
+
         }
 
         private void Hide_Click(object sender, RoutedEventArgs e)
@@ -307,12 +363,12 @@ namespace Pokeri
             tableCard3.Hidden = true;
             tableCard4.Hidden = true;
             tableCard5.Hidden = true;
+
             foreach (Kortti kortti in MyCanvas.Children)
             {
                 kortti.UpdateLooks();
                 kortti.UpdatePosition();
             }
-
         }
 
         public void StartGame_Click(object sender, RoutedEventArgs e)
@@ -326,6 +382,94 @@ namespace Pokeri
             ai3.Money -= 50;
             tablePlayer.Money += 200;
             UpdateUI();
+            StartGame.IsEnabled = false;
+            StartGame.Visibility = Visibility.Collapsed;
+            StartTurn();
         }
-    }// kommentti että voin pushata gittiin
+        private void Timer_Tick(object sender, object e)
+        {
+            int rv = 0; //return value from methods, how much money ai will spend
+            UpdateUI();
+            counter++;
+            if (counter >= 4)
+            {
+                ai1.Action = 5;
+                ai2.Action = 5;
+                ai3.Action = 5;
+                UpdateUI();
+                EnableButtons();
+                timer.Stop();              
+                counter = 0;
+            }
+            if (counter == 1)
+            {            
+                ai2.Action = 5;
+                ai3.Action = 5;
+                UpdateUI();
+                rv = ai1.AiTurn(ai1Hand);
+                tablePlayer.Money += rv;
+                if (ai1.Action == 1)
+                {
+                    CallValue = ai1.ReturnNewCallValue();
+                    UpdateUI();
+                }
+                UpdateUI();
+            }
+            if (counter == 2)
+            {
+                ai1.Action = 5;
+                ai3.Action = 5;
+                UpdateUI();
+                rv = ai2.AiTurn(ai2Hand);
+                tablePlayer.Money += rv;
+                if(ai2.Action == 1)
+                {
+                    CallValue = ai2.ReturnNewCallValue();
+                    UpdateUI();
+                }
+                UpdateUI();
+            }
+            if (counter == 3)
+            {
+                ai2.Action = 5;
+                ai1.Action = 5;
+                rv = ai3.AiTurn(ai3Hand);
+                tablePlayer.Money += rv;
+                UpdateUI();
+                if (ai3.Action == 1)
+                {
+                    CallValue = ai3.ReturnNewCallValue();
+                    UpdateUI();
+                }
+                turnCounter++;
+            }            
+        }
+
+        private void Call_Click(object sender, RoutedEventArgs e)
+        {
+            DisableButtons();
+            player.Money -= CallValue;
+            tablePlayer.Money += CallValue;
+            StartTurn();
+        }
+        private void DisableButtons()
+        {
+            Call.IsEnabled = false;
+            Raise.IsEnabled = false;
+        }
+        private void EnableButtons()
+        {
+            Call.IsEnabled = true;
+            Raise.IsEnabled = true;
+        }
+
+        private void Raise_Click(object sender, RoutedEventArgs e)
+        {
+            DisableButtons();
+            CallValue += 50;
+            player.Money -= CallValue;
+            tablePlayer.Money += CallValue;
+            StartTurn();
+        }
+    }
 }

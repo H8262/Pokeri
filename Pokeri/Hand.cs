@@ -28,6 +28,10 @@ namespace Pokeri
                 Debug.WriteLine(" " + card.Suit + " " + card.Number);
             }
         }
-
+       /* public void GetValue()
+        {
+            if 
+        }
+        */
     }
 }
