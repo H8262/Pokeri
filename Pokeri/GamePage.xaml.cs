@@ -278,6 +278,15 @@ namespace Pokeri
 
             UpdateUI();
             DisableButtons();
+
+            playerHand.AddCard(card9);
+            playerHand.AddCard(card10);
+            playerHand.AddCard(card11);
+            playerHand.AddCard(card12);
+            playerHand.AddCard(card13);
+
+            int Cardvalue = playerHand.GetHandValues();
+            Debug.WriteLine("Käden arvo: " + Cardvalue);
     }
 
         private void Reveal_Click(object sender, RoutedEventArgs e)

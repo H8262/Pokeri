@@ -14,7 +14,7 @@ namespace Pokeri
         public int playerAction; // What player had done 0 = Call, 1 = Raise, 2 = ALLIN! 3 = Fold, folding works same as player had called
         public int CallValue;
         public int AiVariable = 101; // 0 - 66 values = Ai will call
-        public int AiVariable2 = 0; 
+        public int AiVariable2 = 0;  // 0 -5 fold, 6 - 66 call, 67 - 94 Raise, 95 - 100 All In 
 
         Random random = new Random();
 
