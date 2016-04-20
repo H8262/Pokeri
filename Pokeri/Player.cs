@@ -15,6 +15,8 @@ namespace Pokeri
         public int CallValue;
         public int AiVariable = 101; // 0 - 66 values = Ai will call
         public int AiVariable2 = 0;  // 0 -5 fold, 6 - 66 call, 67 - 94 Raise, 95 - 100 All In 
+        public int HandValue = 0;
+        public int winner = 0; // 0 = loser, 1 = winner, 2 = draw
 
         Random random = new Random();
 

@@ -32,6 +32,11 @@ namespace Pokeri
         string TableCash;
         int CallValue = 50; // how much is Call?
 
+        bool phase1 = false;// varmistetaan että eräät metodit toteutuvat vain kerran
+        bool phase2 = false;// AddCardstoHandPhase1,2,3
+        bool phase3 = false;//
+        bool endgame = false;
+
         public Kortti kortti1;
         public Kortti kortti2;
         public Kortti ai1Card1;
@@ -51,11 +56,27 @@ namespace Pokeri
         Player ai3;
         Player tablePlayer;
 
+        Hand playerHand;
         Hand ai1Hand;
         Hand ai2Hand;
         Hand ai3Hand;
         Hand table;
 
+        Card card1;
+        Card card2;
+        Card card3;
+        Card card4;
+        Card card5;
+        Card card6;
+        Card card7;
+        Card card8;
+        Card card9;
+        Card card10;
+        Card card11;
+        Card card12;
+        Card card13;
+
+        int voittopotti = 0;
 
         // timer juttuja
         private DispatcherTimer timer;
@@ -65,9 +86,6 @@ namespace Pokeri
         //start turn
         public void StartTurn()
         {
-            timer = new DispatcherTimer();
-            timer.Tick += Timer_Tick;
-            timer.Interval = new TimeSpan(0, 0, 1);
             timer.Start();
 
         }
@@ -78,6 +96,10 @@ namespace Pokeri
             ApplicationView.PreferredLaunchWindowingMode
                 = ApplicationViewWindowingMode.PreferredLaunchViewSize;
             ApplicationView.PreferredLaunchViewSize = new Size(800, 600);
+
+            timer = new DispatcherTimer();
+            timer.Tick += Timer_Tick;
+            timer.Interval = new TimeSpan(0, 0, 1);
 
             player = new Player { Name = "Player", Money = 2000 };
             ai1 = new Player { Name = "AI Player 1", Money = 2000 };
@@ -91,26 +113,26 @@ namespace Pokeri
             this.InitializeComponent();
             Deck deck = new Deck();
             Card card = new Card();
-            Hand playerHand = new Hand(); //pelaajan käsi
+            playerHand = new Hand(); //pelaajan käsi
             ai1Hand = new Hand(); // tietokonevastustajien kädet
             ai2Hand = new Hand();
             ai3Hand = new Hand();
             table = new Hand(); // pöydän kortit
 
             deck.BuildDeck(card);
-            Card card1 = new Card(); // ei kaunis, kehittelen loopin jos aikaa
-            Card card2 = new Card();
-            Card card3 = new Card();
-            Card card4 = new Card();
-            Card card5 = new Card();
-            Card card6 = new Card();
-            Card card7 = new Card();
-            Card card8 = new Card();
-            Card card9 = new Card();
-            Card card10 = new Card();
-            Card card11 = new Card();
-            Card card12 = new Card();
-            Card card13 = new Card();
+            card1 = new Card(); // ei kaunis, kehittelen loopin jos aikaa
+            card2 = new Card();
+            card3 = new Card();
+            card4 = new Card();
+            card5 = new Card();
+            card6 = new Card();
+            card7 = new Card();
+            card8 = new Card();
+            card9 = new Card();
+            card10 = new Card();
+            card11 = new Card();
+            card12 = new Card();
+            card13 = new Card();
 
             card1 = deck.ServeCard();
             card2 = deck.ServeCard();
@@ -128,6 +150,31 @@ namespace Pokeri
 
             deck.DebugList();
 
+            // DEBUG KORTIT
+            /*
+            card1.Suit = 0;
+            card1.Number = 0;
+
+            card2.Suit = 1;
+            card2.Number = 0;
+
+            card9.Suit = 2;
+            card9.Number = 0;
+
+            card10.Suit = 3;
+            card10.Number = 2;
+
+            card11.Suit = 0;
+            card11.Number = 0;
+
+            card12.Suit = 1;
+            card12.Number = 9;
+
+            card13.Suit = 2;
+            card13.Number = 4;
+            */
+            // DEBUG KORTIT
+
             playerHand.AddCard(card1);
             playerHand.AddCard(card2);
             ai1Hand.AddCard(card3);
@@ -141,17 +188,15 @@ namespace Pokeri
             table.AddCard(card11);
             table.AddCard(card12);
             table.AddCard(card13);
+            /*
+            playerHand.AddCard(card9); // Debug lista
+            playerHand.AddCard(card10);
+            playerHand.AddCard(card11);
+            playerHand.AddCard(card12);
+            playerHand.AddCard(card13);
+            */
 
-            Debug.WriteLine("Player hand:");
-            playerHand.ShowHands();
-            Debug.WriteLine("AI1 hand:");
-            ai1Hand.ShowHands();
-            Debug.WriteLine("AI2 hand:");
-            ai2Hand.ShowHands();
-            Debug.WriteLine("AI3 hand:");
-            ai3Hand.ShowHands();
-            Debug.WriteLine("Table hand:");
-            table.ShowHands();
+            DebugShowHands();
 
             kortti1 = new Kortti // lisätään kortti canvakselle
             {
@@ -279,14 +324,6 @@ namespace Pokeri
             UpdateUI();
             DisableButtons();
 
-            playerHand.AddCard(card9);
-            playerHand.AddCard(card10);
-            playerHand.AddCard(card11);
-            playerHand.AddCard(card12);
-            playerHand.AddCard(card13);
-
-            int Cardvalue = playerHand.GetHandValues();
-            Debug.WriteLine("Käden arvo: " + Cardvalue);
     }
 
         private void Reveal_Click(object sender, RoutedEventArgs e)
@@ -329,32 +366,64 @@ namespace Pokeri
                 case 0: ai1ActionTextBlock.Text = "Call!" + CallValue + " $"; break;
                 case 1: ai1ActionTextBlock.Text = "Raise!" + CallValue + " $"; break;
                 case 5: ai1ActionTextBlock.Text = "Waiting..."; break;
+                case 7: ai1ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
+                case 8: ai1ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
             }
             switch (ai2.Action)
             {
                 case 0: ai2ActionTextBlock.Text = "Call!" + CallValue + " $"; break;
                 case 1: ai2ActionTextBlock.Text = "Raise!" + CallValue + " $"; break;
                 case 5: ai2ActionTextBlock.Text = "Waiting..."; break;
+                case 7: ai2ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
+                case 8: ai2ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
             }
             switch (ai3.Action)
             {
                 case 0: ai3ActionTextBlock.Text = "Call!" + CallValue + " $"; break;
                 case 1: ai3ActionTextBlock.Text = "Raise!" + CallValue + " $"; break;
                 case 5: ai3ActionTextBlock.Text = "Waiting..."; break;
+                case 7: ai3ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
+                case 8: ai3ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
             }
-            if (turnCounter == 5)
+            if (turnCounter == 3)
             {
                 tableCard1.Hidden = false;
                 tableCard2.Hidden = false;
                 tableCard3.Hidden = false;
+                AddCardsToHandPhase1();
+                //GetHandValues();
+                DebugShowHands();
+                ValuesDebug();
+            }
+            if (turnCounter == 5)
+            {
+                tableCard4.Hidden = false;
+                AddCardsToHandPhase2();
+                //GetHandValues();
+                DebugShowHands();
+                ValuesDebug();
+            }
+            if (turnCounter == 6)
+            {
+                tableCard5.Hidden = false;
+                AddCardsToHandPhase3();
+                //GetHandValues();
+                DebugShowHands();
+                ValuesDebug();
             }
             if (turnCounter == 7)
             {
-                tableCard4.Hidden = false;
-            }
-            if (turnCounter == 8)
-            {
-                tableCard5.Hidden = false;
+                ai1Card1.Hidden = false;
+                ai1Card2.Hidden = false;
+                ai2Card1.Hidden = false;
+                ai2Card2.Hidden = false;
+                ai3Card1.Hidden = false;
+                ai3Card2.Hidden = false;
+                if (endgame == false)
+                {
+                    EndGame();
+                }
+                timer.Stop();  
             }
 
         }
@@ -379,6 +448,70 @@ namespace Pokeri
                 kortti.UpdatePosition();
             }
         }
+        public void AddCardsToHandPhase1() // lisätään pöydässä olevat kortit pelaajien käteen käden laskua ja tekoälyn toimintaa varten
+        {
+            if (phase1 == false)
+            {
+                playerHand.AddCard(card9);
+                playerHand.AddCard(card10);
+                playerHand.AddCard(card11);
+
+                ai1Hand.AddCard(card9);
+                ai1Hand.AddCard(card10);
+                ai1Hand.AddCard(card11);
+
+                ai2Hand.AddCard(card9);
+                ai2Hand.AddCard(card10);
+                ai2Hand.AddCard(card11);
+
+                ai3Hand.AddCard(card9);
+                ai3Hand.AddCard(card10);
+                ai3Hand.AddCard(card11);
+
+                phase1 = true;
+            }
+        }
+
+        public void AddCardsToHandPhase2()
+        {
+            if (phase2 == false)
+            {
+                playerHand.AddCard(card12);
+
+                ai1Hand.AddCard(card12);
+
+                ai2Hand.AddCard(card12);
+
+                ai3Hand.AddCard(card12);
+
+                phase2 = true;
+            }
+        }
+
+
+        public void AddCardsToHandPhase3()
+        {
+            if (phase3 == false)
+            {
+                playerHand.AddCard(card13);
+
+                ai1Hand.AddCard(card13);
+
+                ai2Hand.AddCard(card13);
+
+                ai3Hand.AddCard(card13);
+
+                phase3 = true;
+            }
+        }
+
+        public void GetHandValues()
+        {
+            player.HandValue = playerHand.GetHandValues();
+            ai1.HandValue = ai1Hand.GetHandValues();
+            ai2.HandValue = ai2Hand.GetHandValues();
+            ai3.HandValue = ai3Hand.GetHandValues();
+        }
 
         public void StartGame_Click(object sender, RoutedEventArgs e)
         {
@@ -402,6 +535,7 @@ namespace Pokeri
             counter++;
             if (counter >= 4)
             {
+                turnCounter++;
                 ai1.Action = 5;
                 ai2.Action = 5;
                 ai3.Action = 5;
@@ -449,8 +583,7 @@ namespace Pokeri
                 {
                     CallValue = ai3.ReturnNewCallValue();
                     UpdateUI();
-                }
-                turnCounter++;
+                }                
             }            
         }
 
@@ -480,5 +613,127 @@ namespace Pokeri
             tablePlayer.Money += CallValue;
             StartTurn();
         }
+
+        public void DebugShowHands()
+        {
+            Debug.WriteLine("Player hand:");
+            playerHand.ShowHands();
+            Debug.WriteLine("AI1 hand:");
+            ai1Hand.ShowHands();
+            Debug.WriteLine("AI2 hand:");
+            ai2Hand.ShowHands();
+            Debug.WriteLine("AI3 hand:");
+            ai3Hand.ShowHands();
+            Debug.WriteLine("Table hand:");
+            table.ShowHands();
+        }
+
+        public void ValuesDebug()
+        {
+            int Cardvalue = playerHand.GetHandValues();
+            Debug.WriteLine("Käden arvo: " + Cardvalue);
+            int Cardvalue1 = ai1Hand.GetHandValues();
+            Debug.WriteLine("Käden arvo: " + Cardvalue1);
+            int Cardvalue2 = ai2Hand.GetHandValues();
+            Debug.WriteLine("Käden arvo: " + Cardvalue2);
+            int Cardvalue3 = ai3Hand.GetHandValues();
+            Debug.WriteLine("Käden arvo: " + Cardvalue3);
+        }
+
+        public void EndGame()
+        {
+            GetHandValues();
+            int v = 0;
+            int j = 0;
+            voittopotti = 0;
+
+            v = player.HandValue;
+            if (ai1.HandValue > v) v = ai1.HandValue;
+            if (ai2.HandValue > v) v = ai2.HandValue;
+            if (ai3.HandValue > v) v = ai3.HandValue;
+
+            if (v == player.HandValue)
+            {
+                player.winner = 1;
+                j++;
+            }
+            if (v == ai1.HandValue)
+            {
+                ai1.winner = 1;
+                j++;
+            }
+            if (v == ai2.HandValue)
+            {
+                ai2.winner = 1;
+                j++;
+            }
+            if (v == ai3.HandValue)
+            {
+                ai3.winner = 1;
+                j++;
+            }
+
+            if (j > 1)
+            {
+                voittopotti = tablePlayer.Money / j;
+
+                if (player.winner == 1)
+                {
+                    player.winner = 2;
+                    player.Money += voittopotti;
+                }
+                if (ai1.winner == 1)
+                {
+                    ai1.winner = 2;
+                    ai1.Money += voittopotti;
+                    ai1.Action = 7;
+                }
+                if (ai2.winner == 1)
+                {
+                    ai2.winner = 2;
+                    ai2.Money += voittopotti;
+                    ai2.Action = 7;
+                }
+                if (ai3.winner == 1)
+                {
+                    ai3.winner = 2;
+                    ai3.Money += voittopotti;
+                    ai3.Action = 7;
+                }
+                tablePlayer.Money = 0;
+
+            }
+            if (j == 1)
+            {
+                voittopotti = tablePlayer.Money;
+                if (player.winner == 1)
+                {                    
+                    player.Money += voittopotti;
+                }
+                if (ai1.winner == 1)
+                {
+                    ai1.Money += voittopotti;
+                    ai1.Action = 8;
+                }
+                if (ai2.winner == 1)
+                {
+                    ai2.Money += voittopotti;
+                    ai2.Action = 8;
+                }
+                if (ai3.winner == 1)
+                {
+                    ai3.Money += voittopotti;
+                    ai3.Action = 8;
+                }
+
+                tablePlayer.Money = 0;
+            }
+            endgame = true;
+            DisableButtons();
+            StartGame.IsEnabled = true;
+            StartGame.Visibility = Visibility.Visible;
+            turnCounter = 0;
+            UpdateUI();
+        }   
     }
 }
