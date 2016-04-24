@@ -22,17 +22,15 @@ namespace Pokeri
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        Data data;
         public MainPage()
         {
             this.InitializeComponent();
-            
         }
 
-        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        public void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            string name = PlayerName.Text;
             this.Frame.Navigate(typeof(GamePage));
-            this.Frame.Navigate(typeof(GamePage), name);
         }
     }
 }

@@ -37,6 +37,7 @@
             />
         </StackPanel>
         <StackPanel Margin="450,450,50,50">
+            <TextBlock x:Name="playerActionTextBlock" Text="pohjatekstiä"/>
             <TextBlock x:Name="playerNameGamePage" Text="pohjatekstiä"/>
             <TextBlock x:Name="playerMoneyGamePage" Text="pohjatekstiä"/>
             <Button x:Name="StartGame" Content="StartGame" Click="StartGame_Click"/>
@@ -65,7 +66,7 @@
             <Button x:Name="Call" Content="Call" Margin="10" Click="Call_Click" IsEnabled="True"/>
             <Button x:Name="Raise" Content="Raise" Margin="10" Click="Raise_Click"/>
             <Button x:Name="AllIn" Content="All In" Margin="10"/>
-            <Button x:Name="Fold" Content="Fold" Margin="10"/>
+            <Button x:Name="Fold" Content="Fold" Margin="10" Click="Fold_Click"/>
         </StackPanel>
     </Grid>
 </Page>

@@ -17,6 +17,7 @@ namespace Pokeri
         public int AiVariable2 = 0;  // 0 -5 fold, 6 - 66 call, 67 - 94 Raise, 95 - 100 All In 
         public int HandValue = 0;
         public int winner = 0; // 0 = loser, 1 = winner, 2 = draw
+        public bool Fold = false; // has player folded?
 
         Random random = new Random();
 
@@ -36,7 +37,7 @@ namespace Pokeri
             if (rand > 66 && rand <= 100)
             {
                 // AI Raises
-                CallValue += 50;
+                CallValue += 5;
                 Money -= CallValue;
                 ReturnValue += CallValue;
                 Action = 1;

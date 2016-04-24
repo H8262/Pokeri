@@ -23,14 +23,13 @@ namespace Pokeri
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class GamePage : Page
-    {        
-        string PlayerName;
+    {                
         string PlayerCash;
         string Ai1Cash;
         string Ai2Cash;
         string Ai3Cash;
         string TableCash;
-        int CallValue = 50; // how much is Call?
+        int CallValue = 5; // how much is Call?
 
         bool phase1 = false;// varmistetaan että eräät metodit toteutuvat vain kerran
         bool phase2 = false;// AddCardstoHandPhase1,2,3
@@ -75,6 +74,9 @@ namespace Pokeri
         Card card11;
         Card card12;
         Card card13;
+        Data data;
+        Data data1;
+        bool NewGame = false;
 
         int voittopotti = 0;
 
@@ -91,23 +93,53 @@ namespace Pokeri
         }
         // timer jutut päättyy
 
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {           
+            if (e.Parameter is Data)
+            {
+                data = new Data();
+
+                data1 = (Data)e.Parameter;
+                NewGame = true;
+                data.player = data1.player;
+                data.ai1 = data1.ai1;
+                data.ai2 = data1.ai2;
+                data.ai3 = data1.ai3;
+            }
+            else
+            {
+                NewGame = false;
+            }
+            base.OnNavigatedTo(e);
+        }
+        
+        
         public GamePage()
         {
+
             ApplicationView.PreferredLaunchWindowingMode
                 = ApplicationViewWindowingMode.PreferredLaunchViewSize;
             ApplicationView.PreferredLaunchViewSize = new Size(800, 600);
 
+            
+                player = new Player { Name = "Player", Money = 2000 };
+                ai1 = new Player { Name = "AI Player 1", Money = 2000 };
+                ai2 = new Player { Name = "AI Player 2", Money = 2000 };
+                ai3 = new Player { Name = "AI Player 3", Money = 2000 };
+                tablePlayer = new Player { Name = "Table", Money = 0 };
+            if (NewGame == true)
+            {
+                player.Money = data.player;
+                ai1.Money = data.ai1;
+                ai2.Money = data.ai2;
+                ai3.Money = data.ai3;
+            }
+
+
+
             timer = new DispatcherTimer();
             timer.Tick += Timer_Tick;
             timer.Interval = new TimeSpan(0, 0, 1);
-
-            player = new Player { Name = "Player", Money = 2000 };
-            ai1 = new Player { Name = "AI Player 1", Money = 2000 };
-            ai2 = new Player { Name = "AI Player 2", Money = 2000 };
-            ai3 = new Player { Name = "AI Player 3", Money = 2000 };
-            tablePlayer = new Player { Name = "Table", Money = 0 };
-
-            PlayerName = player.Name;
 
             Random rand = new Random();
             this.InitializeComponent();
@@ -321,9 +353,9 @@ namespace Pokeri
             MyCanvas.Children.Add(tableCard4);
             MyCanvas.Children.Add(tableCard5);
 
-            UpdateUI();
+            player.Action = 2;
+            UpdateUI();            
             DisableButtons();
-
     }
 
         private void Reveal_Click(object sender, RoutedEventArgs e)
@@ -344,7 +376,7 @@ namespace Pokeri
             Ai3Cash = Convert.ToString(ai3.Money);
             TableCash = Convert.ToString(tablePlayer.Money);
 
-            playerNameGamePage.Text = PlayerName;
+            playerNameGamePage.Text = player.Name;
             playerMoneyGamePage.Text = PlayerCash + " $";
             ai1MoneyGamePage.Text = Ai1Cash + " $";
             ai2MoneyGamePage.Text = Ai2Cash + " $";
@@ -361,29 +393,44 @@ namespace Pokeri
                 kortti.UpdatePosition();
             }
 
-            switch(ai1.Action)
+            switch (player.Action)
             {
-                case 0: ai1ActionTextBlock.Text = "Call!" + CallValue + " $"; break;
-                case 1: ai1ActionTextBlock.Text = "Raise!" + CallValue + " $"; break;
+                case 0: playerActionTextBlock.Text = "Call! " + CallValue + " $"; break;
+                case 1: playerActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
+                case 2: playerActionTextBlock.Text = "Start Game!"; break;
+                case 3: playerActionTextBlock.Text = "Your Turn!"; break;
+                case 5: playerActionTextBlock.Text = "Not Your Turn! "; break;
+                case 7: playerActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
+                case 8: playerActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
+                case 9: playerActionTextBlock.Text = "Loser! "; break;
+            }
+
+            switch (ai1.Action)
+            {
+                case 0: ai1ActionTextBlock.Text = "Call! " + CallValue + " $"; break;
+                case 1: ai1ActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
                 case 5: ai1ActionTextBlock.Text = "Waiting..."; break;
                 case 7: ai1ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
                 case 8: ai1ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
+                case 9: ai1ActionTextBlock.Text = "Loser! "; break;
             }
             switch (ai2.Action)
             {
-                case 0: ai2ActionTextBlock.Text = "Call!" + CallValue + " $"; break;
-                case 1: ai2ActionTextBlock.Text = "Raise!" + CallValue + " $"; break;
+                case 0: ai2ActionTextBlock.Text = "Call! " + CallValue + " $"; break;
+                case 1: ai2ActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
                 case 5: ai2ActionTextBlock.Text = "Waiting..."; break;
                 case 7: ai2ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
                 case 8: ai2ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
+                case 9: ai2ActionTextBlock.Text = "Loser! "; break;
             }
             switch (ai3.Action)
             {
-                case 0: ai3ActionTextBlock.Text = "Call!" + CallValue + " $"; break;
-                case 1: ai3ActionTextBlock.Text = "Raise!" + CallValue + " $"; break;
+                case 0: ai3ActionTextBlock.Text = "Call! " + CallValue + " $"; break;
+                case 1: ai3ActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
                 case 5: ai3ActionTextBlock.Text = "Waiting..."; break;
                 case 7: ai3ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
                 case 8: ai3ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
+                case 9: ai3ActionTextBlock.Text = "Loser! "; break;
             }
             if (turnCounter == 3)
             {
@@ -515,18 +562,32 @@ namespace Pokeri
 
         public void StartGame_Click(object sender, RoutedEventArgs e)
         {
-            kortti1.Hidden = false;
-            kortti2.Hidden = false;
+            if (endgame == false)
+            {
+                kortti1.Hidden = false;
+                kortti2.Hidden = false;
 
-            player.Money -= 50;
-            ai1.Money -= 50;
-            ai2.Money -= 50;
-            ai3.Money -= 50;
-            tablePlayer.Money += 200;
-            UpdateUI();
-            StartGame.IsEnabled = false;
-            StartGame.Visibility = Visibility.Collapsed;
-            StartTurn();
+                player.Money -= 5;
+                ai1.Money -= 5;
+                ai2.Money -= 5;
+                ai3.Money -= 5;
+                tablePlayer.Money += 20;
+                UpdateUI();
+                StartGame.IsEnabled = false;
+                StartGame.Visibility = Visibility.Collapsed;
+                StartTurn();
+            }
+             else
+            {
+                Data data = new Data();
+                data.player = player.Money;
+                data.ai1 = ai1.Money;
+                data.ai2 = ai2.Money;
+                data.ai3 = ai3.Money;
+                this.Frame.Navigate(typeof(LoadingPage), data);
+                
+            }
+            
         }
         private void Timer_Tick(object sender, object e)
         {
@@ -536,18 +597,38 @@ namespace Pokeri
             if (counter >= 4)
             {
                 turnCounter++;
-                ai1.Action = 5;
-                ai2.Action = 5;
-                ai3.Action = 5;
-                UpdateUI();
-                EnableButtons();
-                timer.Stop();              
-                counter = 0;
+                if (player.Fold == true)
+                {
+                    counter = 0;
+                    UpdateUI();
+                }
+                else
+                {
+                    if (turnCounter == 7)
+                    {
+                        timer.Stop();
+                        DisableButtons();
+                        UpdateUI();
+                    }
+                    else
+                    {
+                        ai1.Action = 5;
+                        ai2.Action = 5;
+                        ai3.Action = 5;
+                        player.Action = 3;
+                        UpdateUI();
+                        EnableButtons();
+                        timer.Stop();
+                        counter = 0;
+                    }
+                }
+                    
             }
             if (counter == 1)
             {            
                 ai2.Action = 5;
                 ai3.Action = 5;
+                player.Action = 5;
                 UpdateUI();
                 rv = ai1.AiTurn(ai1Hand);
                 tablePlayer.Money += rv;
@@ -562,6 +643,7 @@ namespace Pokeri
             {
                 ai1.Action = 5;
                 ai3.Action = 5;
+                player.Action = 5;
                 UpdateUI();
                 rv = ai2.AiTurn(ai2Hand);
                 tablePlayer.Money += rv;
@@ -576,6 +658,7 @@ namespace Pokeri
             {
                 ai2.Action = 5;
                 ai1.Action = 5;
+                player.Action = 5;
                 rv = ai3.AiTurn(ai3Hand);
                 tablePlayer.Money += rv;
                 UpdateUI();
@@ -583,36 +666,44 @@ namespace Pokeri
                 {
                     CallValue = ai3.ReturnNewCallValue();
                     UpdateUI();
-                }                
+                }
+                UpdateUI();       
             }            
         }
 
         private void Call_Click(object sender, RoutedEventArgs e)
         {
+            player.Action = 0;
             DisableButtons();
             player.Money -= CallValue;
             tablePlayer.Money += CallValue;
+            UpdateUI();
             StartTurn();
         }
         private void DisableButtons()
         {
             Call.IsEnabled = false;
             Raise.IsEnabled = false;
+            Fold.IsEnabled = false;
         }
         private void EnableButtons()
         {
             Call.IsEnabled = true;
             Raise.IsEnabled = true;
+            Fold.IsEnabled = true;
         }
 
         private void Raise_Click(object sender, RoutedEventArgs e)
         {
+            player.Action = 1;
             DisableButtons();
-            CallValue += 50;
+            CallValue += 5;
             player.Money -= CallValue;
             tablePlayer.Money += CallValue;
+            UpdateUI();
             StartTurn();
-        }
+                            
+         }
 
         public void DebugShowHands()
         {
@@ -679,26 +770,37 @@ namespace Pokeri
 
                 if (player.winner == 1)
                 {
-                    player.winner = 2;
                     player.Money += voittopotti;
+                    player.Action = 7;
+
+                    if (ai1.winner != 1) ai1.Action = 9;
+                    if (ai2.winner != 1) ai2.Action = 9;
+                    if (ai3.winner != 1) ai3.Action = 9;
+
                 }
                 if (ai1.winner == 1)
                 {
-                    ai1.winner = 2;
                     ai1.Money += voittopotti;
                     ai1.Action = 7;
+                    if (player.winner != 1) player.Action = 9;
+                    if (ai2.winner != 1) ai2.Action = 9;
+                    if (ai3.winner != 1) ai3.Action = 9;
                 }
                 if (ai2.winner == 1)
                 {
-                    ai2.winner = 2;
                     ai2.Money += voittopotti;
                     ai2.Action = 7;
+                    if (player.winner != 1) player.Action = 9;
+                    if (ai1.winner != 1) ai1.Action = 9;
+                    if (ai3.winner != 1) ai3.Action = 9;
                 }
                 if (ai3.winner == 1)
                 {
-                    ai3.winner = 2;
                     ai3.Money += voittopotti;
                     ai3.Action = 7;
+                    if (player.winner != 1) player.Action = 9;
+                    if (ai2.winner != 1) ai2.Action = 9;
+                    if (ai1.winner != 1) ai1.Action = 9;
                 }
                 tablePlayer.Money = 0;
 
@@ -709,21 +811,34 @@ namespace Pokeri
                 if (player.winner == 1)
                 {                    
                     player.Money += voittopotti;
+                    player.Action = 8;
+                    ai1.Action = 9;
+                    ai2.Action = 9;
+                    ai3.Action = 9;
                 }
                 if (ai1.winner == 1)
                 {
                     ai1.Money += voittopotti;
                     ai1.Action = 8;
+                    ai2.Action = 9;
+                    ai3.Action = 9;
+                    player.Action = 9;
                 }
                 if (ai2.winner == 1)
                 {
                     ai2.Money += voittopotti;
                     ai2.Action = 8;
+                    ai1.Action = 9;
+                    ai3.Action = 9;
+                    player.Action = 9;
                 }
                 if (ai3.winner == 1)
                 {
                     ai3.Money += voittopotti;
                     ai3.Action = 8;
+                    player.Action = 9;
+                    ai1.Action = 9;
+                    ai2.Action = 9;
                 }
 
                 tablePlayer.Money = 0;
@@ -734,6 +849,14 @@ namespace Pokeri
             StartGame.Visibility = Visibility.Visible;
             turnCounter = 0;
             UpdateUI();
-        }   
+        }
+
+        private void Fold_Click(object sender, RoutedEventArgs e)
+        {
+            player.Fold = true;
+            DisableButtons();
+            UpdateUI();
+            StartTurn();
+        }
     }
 }
