@@ -44,32 +44,7 @@ namespace Pokeri
 
         public bool Suora()
         {
-            /*
-            int h = 0;
-            int k = 0;
-            int z = 0;
-            int f = hand.Count;
 
-
-            foreach(Card card in hand)
-            {
-                h = card.Number;
-                foreach(Card card1 in hand)
-                {
-                    k = card.Number;
-                    if (h+1 == k)
-                    {
-                        z++;
-                    }
-                }
-            }
-                                    
-            if (z >= 5)
-            {
-                return true;
-            }
-            else return false;
-            */
             int h = 0;
             int k = 0;
             int z = 0;
@@ -95,7 +70,7 @@ namespace Pokeri
                             z++;
                         }
                     }
-                    if (z >= 5) return true;
+                    if (z >= 4) return true;
                 }
             }
                 return false;

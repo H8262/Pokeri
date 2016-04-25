@@ -22,7 +22,6 @@ namespace Pokeri
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        Data data;
         public MainPage()
         {
             this.InitializeComponent();

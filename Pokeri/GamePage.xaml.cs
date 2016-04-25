@@ -121,7 +121,6 @@ namespace Pokeri
                 = ApplicationViewWindowingMode.PreferredLaunchViewSize;
             ApplicationView.PreferredLaunchViewSize = new Size(800, 600);
 
-            
                 player = new Player { Name = "Player", Money = 2000 };
                 ai1 = new Player { Name = "AI Player 1", Money = 2000 };
                 ai2 = new Player { Name = "AI Player 2", Money = 2000 };
@@ -134,7 +133,7 @@ namespace Pokeri
                 ai2.Money = data.ai2;
                 ai3.Money = data.ai3;
             }
-
+            
 
 
             timer = new DispatcherTimer();
@@ -768,7 +767,7 @@ namespace Pokeri
             {
                 voittopotti = tablePlayer.Money / j;
 
-                if (player.winner == 1)
+                if (player.winner == 1 && player.Fold == false)
                 {
                     player.Money += voittopotti;
                     player.Action = 7;
@@ -778,7 +777,7 @@ namespace Pokeri
                     if (ai3.winner != 1) ai3.Action = 9;
 
                 }
-                if (ai1.winner == 1)
+                if (ai1.winner == 1 && ai1.Fold == false)
                 {
                     ai1.Money += voittopotti;
                     ai1.Action = 7;
@@ -786,7 +785,7 @@ namespace Pokeri
                     if (ai2.winner != 1) ai2.Action = 9;
                     if (ai3.winner != 1) ai3.Action = 9;
                 }
-                if (ai2.winner == 1)
+                if (ai2.winner == 1 && ai2.Fold == false)
                 {
                     ai2.Money += voittopotti;
                     ai2.Action = 7;
@@ -794,7 +793,7 @@ namespace Pokeri
                     if (ai1.winner != 1) ai1.Action = 9;
                     if (ai3.winner != 1) ai3.Action = 9;
                 }
-                if (ai3.winner == 1)
+                if (ai3.winner == 1 && ai3.Fold == false)
                 {
                     ai3.Money += voittopotti;
                     ai3.Action = 7;
@@ -808,7 +807,7 @@ namespace Pokeri
             if (j == 1)
             {
                 voittopotti = tablePlayer.Money;
-                if (player.winner == 1)
+                if (player.winner == 1 && player.Fold == false)
                 {                    
                     player.Money += voittopotti;
                     player.Action = 8;
@@ -816,7 +815,7 @@ namespace Pokeri
                     ai2.Action = 9;
                     ai3.Action = 9;
                 }
-                if (ai1.winner == 1)
+                if (ai1.winner == 1 && ai1.Fold == false)
                 {
                     ai1.Money += voittopotti;
                     ai1.Action = 8;
@@ -824,7 +823,7 @@ namespace Pokeri
                     ai3.Action = 9;
                     player.Action = 9;
                 }
-                if (ai2.winner == 1)
+                if (ai2.winner == 1 && ai2.Fold == false)
                 {
                     ai2.Money += voittopotti;
                     ai2.Action = 8;
@@ -832,7 +831,7 @@ namespace Pokeri
                     ai3.Action = 9;
                     player.Action = 9;
                 }
-                if (ai3.winner == 1)
+                if (ai3.winner == 1 && ai3.Fold == false)
                 {
                     ai3.Money += voittopotti;
                     ai3.Action = 8;
@@ -859,4 +858,5 @@ namespace Pokeri
             StartTurn();
         }
     }
+
 }

@@ -36,8 +36,9 @@ namespace Pokeri
                 Player.Text = "Player " + data.player;
                 Ai1.Text = "Ai1 " + data.ai1;
                 Ai2.Text = "Ai2 " + data.ai2;
-                Ai3.Text = "Ai3 " + data.ai3;
-                
+                Ai3.Text = "Ai3 " + data.ai3;                
+
+
             }
             else
             {
@@ -48,6 +49,7 @@ namespace Pokeri
 
         private void NewGame_Click(object sender, RoutedEventArgs e)
         {
+
             this.Frame.Navigate(typeof(GamePage),data);
         }
     }

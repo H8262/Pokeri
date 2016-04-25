@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pokeri
 {
-    class Data
+    public class Data
     {
         public int player;
         public int ai1;
