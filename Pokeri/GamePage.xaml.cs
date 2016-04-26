@@ -167,6 +167,12 @@ namespace Pokeri
             player.Action = 2;
             UpdateUI();            
             DisableButtons();
+
+            Hide.IsEnabled = false;
+            Reveal.IsEnabled = false;
+            Hide.Visibility = Visibility.Collapsed;
+            Reveal.Visibility = Visibility.Collapsed;
+
     }
 
         private void Reveal_Click(object sender, RoutedEventArgs e)
@@ -431,7 +437,7 @@ namespace Pokeri
                     tablePlayer.Money += 5;
                     PlayerCount++;
                 }
-                if (ai2.Lost == false)
+                if (ai3.Lost == false)
                 {
                     ai3.Money -= 5;
                     tablePlayer.Money += 5;
