@@ -100,9 +100,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Card.cs" />
-    <Compile Include="Data.cs" />
     <Compile Include="Deck.cs" />
-    <Compile Include="Game.cs" />
     <Compile Include="GamePage.xaml.cs">
       <DependentUpon>GamePage.xaml</DependentUpon>
     </Compile>
