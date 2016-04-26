@@ -45,6 +45,7 @@ namespace Pokeri
             }
             return 0;
 
+
         }
         public void GetCallValue(int callvalue)
         {            
@@ -53,6 +54,11 @@ namespace Pokeri
         public int ReturnNewCallValue()
         {
             return CallValue;
+        }
+
+        public bool GoForAllIn()
+        {
+            return true;
         }
     }
 }

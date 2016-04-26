@@ -33,12 +33,10 @@ namespace Pokeri
             if (e.Parameter is Data)
             {
                 data = (Data)e.Parameter;
-                Player.Text = "Player " + data.player;
-                Ai1.Text = "Ai1 " + data.ai1;
-                Ai2.Text = "Ai2 " + data.ai2;
-                Ai3.Text = "Ai3 " + data.ai3;                
-
-
+                Player.Text = "Player " + data.player + " $";
+                Ai1.Text = "Ai1 " + data.ai1 + " $";
+                Ai2.Text = "Ai2 " + data.ai2 + " $";
+                Ai3.Text = "Ai3 " + data.ai3 + " $";                
             }
             else
             {

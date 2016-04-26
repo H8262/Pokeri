@@ -65,7 +65,7 @@
             <TextBlock x:Name="CallValueTextBlock" Margin="10"/>
             <Button x:Name="Call" Content="Call" Margin="10" Click="Call_Click" IsEnabled="True"/>
             <Button x:Name="Raise" Content="Raise" Margin="10" Click="Raise_Click"/>
-            <Button x:Name="AllIn" Content="All In" Margin="10"/>
+            <Button x:Name="AllIn" Content="All In" Margin="10" Click="AllIn_Click"/>
             <Button x:Name="Fold" Content="Fold" Margin="10" Click="Fold_Click"/>
         </StackPanel>
     </Grid>

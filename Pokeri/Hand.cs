@@ -298,5 +298,15 @@ namespace Pokeri
             }
             return false;
         }
+
+        public void RemoveCards()
+        {
+            /*foreach (Card card in hand)
+            {
+                hand.Remove(card);
+            }
+            */
+            hand.Clear();
+        }
     }
 }

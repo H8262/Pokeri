@@ -35,6 +35,7 @@ namespace Pokeri
         bool phase2 = false;// AddCardstoHandPhase1,2,3
         bool phase3 = false;//
         bool endgame = false;
+        bool IsAllIn = false;
 
         public Kortti kortti1;
         public Kortti kortti2;
@@ -61,6 +62,7 @@ namespace Pokeri
         Hand ai3Hand;
         Hand table;
 
+        Card card;
         Card card1;
         Card card2;
         Card card3;
@@ -74,9 +76,7 @@ namespace Pokeri
         Card card11;
         Card card12;
         Card card13;
-        Data data;
-        Data data1;
-        bool NewGame = false;
+        Deck deck;
 
         int voittopotti = 0;
 
@@ -91,28 +91,7 @@ namespace Pokeri
             timer.Start();
 
         }
-        // timer jutut päättyy
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {           
-            if (e.Parameter is Data)
-            {
-                data = new Data();
-
-                data1 = (Data)e.Parameter;
-                NewGame = true;
-                data.player = data1.player;
-                data.ai1 = data1.ai1;
-                data.ai2 = data1.ai2;
-                data.ai3 = data1.ai3;
-            }
-            else
-            {
-                NewGame = false;
-            }
-            base.OnNavigatedTo(e);
-        }
-        
+        // timer jutut päättyy      
         
         public GamePage()
         {
@@ -121,20 +100,11 @@ namespace Pokeri
                 = ApplicationViewWindowingMode.PreferredLaunchViewSize;
             ApplicationView.PreferredLaunchViewSize = new Size(800, 600);
 
-                player = new Player { Name = "Player", Money = 2000 };
-                ai1 = new Player { Name = "AI Player 1", Money = 2000 };
-                ai2 = new Player { Name = "AI Player 2", Money = 2000 };
-                ai3 = new Player { Name = "AI Player 3", Money = 2000 };
+                player = new Player { Name = "Player", Money = 1000 };
+                ai1 = new Player { Name = "AI Player 1", Money = 1000 };
+                ai2 = new Player { Name = "AI Player 2", Money = 1000 };
+                ai3 = new Player { Name = "AI Player 3", Money = 1000 };
                 tablePlayer = new Player { Name = "Table", Money = 0 };
-            if (NewGame == true)
-            {
-                player.Money = data.player;
-                ai1.Money = data.ai1;
-                ai2.Money = data.ai2;
-                ai3.Money = data.ai3;
-            }
-            
-
 
             timer = new DispatcherTimer();
             timer.Tick += Timer_Tick;
@@ -142,8 +112,8 @@ namespace Pokeri
 
             Random rand = new Random();
             this.InitializeComponent();
-            Deck deck = new Deck();
-            Card card = new Card();
+            deck = new Deck();
+            card = new Card();
             playerHand = new Hand(); //pelaajan käsi
             ai1Hand = new Hand(); // tietokonevastustajien kädet
             ai2Hand = new Hand();
@@ -151,33 +121,7 @@ namespace Pokeri
             table = new Hand(); // pöydän kortit
 
             deck.BuildDeck(card);
-            card1 = new Card(); // ei kaunis, kehittelen loopin jos aikaa
-            card2 = new Card();
-            card3 = new Card();
-            card4 = new Card();
-            card5 = new Card();
-            card6 = new Card();
-            card7 = new Card();
-            card8 = new Card();
-            card9 = new Card();
-            card10 = new Card();
-            card11 = new Card();
-            card12 = new Card();
-            card13 = new Card();
 
-            card1 = deck.ServeCard();
-            card2 = deck.ServeCard();
-            card3 = deck.ServeCard();
-            card4 = deck.ServeCard();
-            card5 = deck.ServeCard();
-            card6 = deck.ServeCard();
-            card7 = deck.ServeCard();
-            card8 = deck.ServeCard();
-            card9 = deck.ServeCard();
-            card10 = deck.ServeCard();
-            card11 = deck.ServeCard();
-            card12 = deck.ServeCard();
-            card13 = deck.ServeCard();
 
             deck.DebugList();
 
@@ -206,19 +150,7 @@ namespace Pokeri
             */
             // DEBUG KORTIT
 
-            playerHand.AddCard(card1);
-            playerHand.AddCard(card2);
-            ai1Hand.AddCard(card3);
-            ai1Hand.AddCard(card4);
-            ai2Hand.AddCard(card5);
-            ai2Hand.AddCard(card6);
-            ai3Hand.AddCard(card7);
-            ai3Hand.AddCard(card8);
-            table.AddCard(card9);
-            table.AddCard(card10);
-            table.AddCard(card11);
-            table.AddCard(card12);
-            table.AddCard(card13);
+            AddCards();
             /*
             playerHand.AddCard(card9); // Debug lista
             playerHand.AddCard(card10);
@@ -228,7 +160,522 @@ namespace Pokeri
             */
 
             DebugShowHands();
+            BuildCanvas();
+            player.Action = 2;
+            UpdateUI();            
+            DisableButtons();
+    }
 
+        private void Reveal_Click(object sender, RoutedEventArgs e)
+        {            
+            foreach (Kortti kortti in MyCanvas.Children)
+            {
+                kortti.Hidden = false;
+                kortti.UpdateLooks();
+                kortti.UpdatePosition();
+            }
+        }
+        public void UpdateUI()
+        {
+
+            PlayerCash = Convert.ToString(player.Money);
+            Ai1Cash = Convert.ToString(ai1.Money);
+            Ai2Cash = Convert.ToString(ai2.Money);
+            Ai3Cash = Convert.ToString(ai3.Money);
+            TableCash = Convert.ToString(tablePlayer.Money);
+
+            playerNameGamePage.Text = player.Name;
+            playerMoneyGamePage.Text = PlayerCash + " $";
+            ai1MoneyGamePage.Text = Ai1Cash + " $";
+            ai2MoneyGamePage.Text = Ai2Cash + " $";
+            ai3MoneyGamePage.Text = Ai3Cash + " $";
+            tableMoneyGamePage.Text = TableCash + " $";
+            ai1.GetCallValue(CallValue);
+            ai2.GetCallValue(CallValue);
+            ai3.GetCallValue(CallValue);
+            CallValueTextBlock.Text = "Call Value: " + Convert.ToString(CallValue);
+
+            foreach (Kortti kortti in MyCanvas.Children)
+            {
+                kortti.UpdateLooks();
+                kortti.UpdatePosition();
+            }
+
+            switch (player.Action)
+            {
+                case 0: playerActionTextBlock.Text = "Call! " + CallValue + " $"; break;
+                case 1: playerActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
+                case 2: playerActionTextBlock.Text = "Start Game!"; break;
+                case 3: playerActionTextBlock.Text = "Your Turn!"; break;
+                case 5: playerActionTextBlock.Text = "Not Your Turn! "; break;
+                case 7: playerActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
+                case 8: playerActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
+                case 9: playerActionTextBlock.Text = "Loser! "; break;
+            }
+
+            switch (ai1.Action)
+            {
+                case 0: ai1ActionTextBlock.Text = "Call! " + CallValue + " $"; break;
+                case 1: ai1ActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
+                case 5: ai1ActionTextBlock.Text = "Waiting..."; break;
+                case 7: ai1ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
+                case 8: ai1ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
+                case 9: ai1ActionTextBlock.Text = "Loser! "; break;
+            }
+            switch (ai2.Action)
+            {
+                case 0: ai2ActionTextBlock.Text = "Call! " + CallValue + " $"; break;
+                case 1: ai2ActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
+                case 5: ai2ActionTextBlock.Text = "Waiting..."; break;
+                case 7: ai2ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
+                case 8: ai2ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
+                case 9: ai2ActionTextBlock.Text = "Loser! "; break;
+            }
+            switch (ai3.Action)
+            {
+                case 0: ai3ActionTextBlock.Text = "Call! " + CallValue + " $"; break;
+                case 1: ai3ActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
+                case 5: ai3ActionTextBlock.Text = "Waiting..."; break;
+                case 7: ai3ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
+                case 8: ai3ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
+                case 9: ai3ActionTextBlock.Text = "Loser! "; break;
+            }
+
+            if (turnCounter == 3)
+            {
+                tableCard1.Hidden = false;
+                tableCard2.Hidden = false;
+                tableCard3.Hidden = false;
+                AddCardsToHandPhase1();
+                //GetHandValues();
+                DebugShowHands();
+                ValuesDebug();
+            }
+            if (turnCounter == 5)
+            {
+                tableCard4.Hidden = false;
+                AddCardsToHandPhase2();
+                //GetHandValues();
+                DebugShowHands();
+                ValuesDebug();
+            }
+            if (turnCounter == 6)
+            {
+                tableCard5.Hidden = false;
+                AddCardsToHandPhase3();
+                //GetHandValues();
+                DebugShowHands();
+                ValuesDebug();
+            }
+            if (turnCounter == 7)
+            {
+                ai1Card1.Hidden = false;
+                ai1Card2.Hidden = false;
+                ai2Card1.Hidden = false;
+                ai2Card2.Hidden = false;
+                ai3Card1.Hidden = false;
+                ai3Card2.Hidden = false;
+                if (endgame == false)
+                {
+                    EndGame();
+                }
+                timer.Stop();  
+            }
+        }
+
+        private void Hide_Click(object sender, RoutedEventArgs e)
+        {
+            ai1Card1.Hidden = true;
+            ai1Card2.Hidden = true;
+            ai2Card1.Hidden = true;
+            ai2Card2.Hidden = true;
+            ai3Card1.Hidden = true;
+            ai3Card2.Hidden = true;
+            tableCard1.Hidden = true;
+            tableCard2.Hidden = true;
+            tableCard3.Hidden = true;
+            tableCard4.Hidden = true;
+            tableCard5.Hidden = true;
+
+            foreach (Kortti kortti in MyCanvas.Children)
+            {
+                kortti.UpdateLooks();
+                kortti.UpdatePosition();
+            }
+        }
+        public void AddCardsToHandPhase1() // lisätään pöydässä olevat kortit pelaajien käteen käden laskua ja tekoälyn toimintaa varten
+        {
+            if (phase1 == false)
+            {
+                playerHand.AddCard(card9);
+                playerHand.AddCard(card10);
+                playerHand.AddCard(card11);
+
+                ai1Hand.AddCard(card9);
+                ai1Hand.AddCard(card10);
+                ai1Hand.AddCard(card11);
+
+                ai2Hand.AddCard(card9);
+                ai2Hand.AddCard(card10);
+                ai2Hand.AddCard(card11);
+
+                ai3Hand.AddCard(card9);
+                ai3Hand.AddCard(card10);
+                ai3Hand.AddCard(card11);
+
+                phase1 = true;
+            }
+        }
+
+        public void AddCardsToHandPhase2()
+        {
+            if (phase2 == false)
+            {
+                playerHand.AddCard(card12);
+
+                ai1Hand.AddCard(card12);
+
+                ai2Hand.AddCard(card12);
+
+                ai3Hand.AddCard(card12);
+
+                phase2 = true;
+            }
+        }
+
+
+        public void AddCardsToHandPhase3()
+        {
+            if (phase3 == false)
+            {
+                playerHand.AddCard(card13);
+
+                ai1Hand.AddCard(card13);
+
+                ai2Hand.AddCard(card13);
+
+                ai3Hand.AddCard(card13);
+
+                phase3 = true;
+            }
+        }
+
+        public void GetHandValues()
+        {
+            player.HandValue = playerHand.GetHandValues();
+            ai1.HandValue = ai1Hand.GetHandValues();
+            ai2.HandValue = ai2Hand.GetHandValues();
+            ai3.HandValue = ai3Hand.GetHandValues();
+        }
+
+        public void StartGame_Click(object sender, RoutedEventArgs e)
+        {
+            if (endgame == false)
+            {
+                kortti1.Hidden = false;
+                kortti2.Hidden = false;
+
+                player.Money -= 5;
+                ai1.Money -= 5;
+                ai2.Money -= 5;
+                ai3.Money -= 5;
+                tablePlayer.Money += 20;
+                UpdateUI();
+                StartGame.IsEnabled = false;
+                StartGame.Visibility = Visibility.Collapsed;
+                StartTurn();
+            }
+             else
+            {
+                NewGame();
+                
+                kortti1.Hidden = false;
+                kortti2.Hidden = false;
+                player.Money -= 5;
+                ai1.Money -= 5;
+                ai2.Money -= 5;
+                ai3.Money -= 5;
+                tablePlayer.Money += 20;
+                StartGame.IsEnabled = false;
+                StartGame.Visibility = Visibility.Collapsed;
+                UpdateUI();
+                StartTurn();
+            }
+            
+        }
+        private void Timer_Tick(object sender, object e)
+        {
+            int rv = 0; //return value from methods, how much money ai will spend
+            UpdateUI();
+            counter++;
+            if (counter >= 4)
+            {
+                turnCounter++;
+                if (player.Fold == true)
+                {
+                    counter = 0;
+                    UpdateUI();
+                }
+                else
+                {
+                    if (turnCounter == 7)
+                    {
+                        timer.Stop();
+                        DisableButtons();
+                        UpdateUI();
+                    }
+                    else
+                    {
+                        ai1.Action = 5;
+                        ai2.Action = 5;
+                        ai3.Action = 5;
+                        player.Action = 3;
+                        UpdateUI();
+                        EnableButtons();
+                        timer.Stop();
+                        counter = 0;
+                    }
+                }
+                    
+            }
+            if (counter == 1)
+            {            
+                ai2.Action = 5;
+                ai3.Action = 5;
+                player.Action = 5;
+                UpdateUI();
+                rv = ai1.AiTurn(ai1Hand);
+                tablePlayer.Money += rv;
+                if (ai1.Action == 1)
+                {
+                    CallValue = ai1.ReturnNewCallValue();
+                    UpdateUI();
+                }
+                UpdateUI();
+            }
+            if (counter == 2)
+            {
+                ai1.Action = 5;
+                ai3.Action = 5;
+                player.Action = 5;
+                UpdateUI();
+                rv = ai2.AiTurn(ai2Hand);
+                tablePlayer.Money += rv;
+                if(ai2.Action == 1)
+                {
+                    CallValue = ai2.ReturnNewCallValue();
+                    UpdateUI();
+                }
+                UpdateUI();
+            }
+            if (counter == 3)
+            {
+                ai2.Action = 5;
+                ai1.Action = 5;
+                player.Action = 5;
+                rv = ai3.AiTurn(ai3Hand);
+                tablePlayer.Money += rv;
+                UpdateUI();
+                if (ai3.Action == 1)
+                {
+                    CallValue = ai3.ReturnNewCallValue();
+                    UpdateUI();
+                }
+                UpdateUI();       
+            }            
+        }
+
+        private void Call_Click(object sender, RoutedEventArgs e)
+        {
+            player.Action = 0;
+            DisableButtons();
+            player.Money -= CallValue;
+            tablePlayer.Money += CallValue;
+            UpdateUI();
+            StartTurn();
+        }
+        private void DisableButtons()
+        {
+            Call.IsEnabled = false;
+            Raise.IsEnabled = false;
+            Fold.IsEnabled = false;
+            AllIn.IsEnabled = false;
+        }
+        private void EnableButtons()
+        {
+            Call.IsEnabled = true;
+            Raise.IsEnabled = true;
+            Fold.IsEnabled = true;
+            AllIn.IsEnabled = true;
+        }
+
+        private void Raise_Click(object sender, RoutedEventArgs e)
+        {
+            player.Action = 1;
+            DisableButtons();
+            CallValue += 5;
+            player.Money -= CallValue;
+            tablePlayer.Money += CallValue;
+            UpdateUI();
+            StartTurn();
+                            
+         }
+
+        public void DebugShowHands()
+        {
+            Debug.WriteLine("Player hand:");
+            playerHand.ShowHands();
+            Debug.WriteLine("AI1 hand:");
+            ai1Hand.ShowHands();
+            Debug.WriteLine("AI2 hand:");
+            ai2Hand.ShowHands();
+            Debug.WriteLine("AI3 hand:");
+            ai3Hand.ShowHands();
+            Debug.WriteLine("Table hand:");
+            table.ShowHands();
+        }
+
+        public void ValuesDebug()
+        {
+            int Cardvalue = playerHand.GetHandValues();
+            Debug.WriteLine("Käden arvo: " + Cardvalue);
+            int Cardvalue1 = ai1Hand.GetHandValues();
+            Debug.WriteLine("Käden arvo: " + Cardvalue1);
+            int Cardvalue2 = ai2Hand.GetHandValues();
+            Debug.WriteLine("Käden arvo: " + Cardvalue2);
+            int Cardvalue3 = ai3Hand.GetHandValues();
+            Debug.WriteLine("Käden arvo: " + Cardvalue3);
+        }
+
+        public void EndGame()
+        {
+            GetHandValues();
+            int v = 0;
+            int j = 0;
+            voittopotti = tablePlayer.Money;
+
+            v = player.HandValue;
+            if (ai1.HandValue > v) v = ai1.HandValue;
+            if (ai2.HandValue > v) v = ai2.HandValue;
+            if (ai3.HandValue > v) v = ai3.HandValue;
+
+            if (v == player.HandValue)
+            {
+                player.winner = 1;
+                j++;
+            }
+            if (v == ai1.HandValue)
+            {
+                ai1.winner = 1;
+                j++;
+            }
+            if (v == ai2.HandValue)
+            {
+                ai2.winner = 1;
+                j++;
+            }
+            if (v == ai3.HandValue)
+            {
+                ai3.winner = 1;
+                j++;
+            }
+
+            if (j > 1)
+            {
+                voittopotti = voittopotti / j;
+
+                if (player.winner == 1 && player.Fold == false)
+                {
+                    player.Money += voittopotti;
+                    player.Action = 7;
+
+                    if (ai1.winner != 1) ai1.Action = 9;
+                    if (ai2.winner != 1) ai2.Action = 9;
+                    if (ai3.winner != 1) ai3.Action = 9;
+
+                }
+                if (ai1.winner == 1 && ai1.Fold == false)
+                {
+                    ai1.Money += voittopotti;
+                    ai1.Action = 7;
+                    if (player.winner != 1) player.Action = 9;
+                    if (ai2.winner != 1) ai2.Action = 9;
+                    if (ai3.winner != 1) ai3.Action = 9;
+                }
+                if (ai2.winner == 1 && ai2.Fold == false)
+                {
+                    ai2.Money += voittopotti;
+                    ai2.Action = 7;
+                    if (player.winner != 1) player.Action = 9;
+                    if (ai1.winner != 1) ai1.Action = 9;
+                    if (ai3.winner != 1) ai3.Action = 9;
+                }
+                if (ai3.winner == 1 && ai3.Fold == false)
+                {
+                    ai3.Money += voittopotti;
+                    ai3.Action = 7;
+                    if (player.winner != 1) player.Action = 9;
+                    if (ai2.winner != 1) ai2.Action = 9;
+                    if (ai1.winner != 1) ai1.Action = 9;
+                }
+                tablePlayer.Money = 0;
+
+            }
+            if (j == 1)
+            {
+                voittopotti = tablePlayer.Money;
+                if (player.winner == 1 && player.Fold == false)
+                {                    
+                    player.Money += voittopotti;
+                    player.Action = 8;
+                    ai1.Action = 9;
+                    ai2.Action = 9;
+                    ai3.Action = 9;
+                }
+                if (ai1.winner == 1 && ai1.Fold == false)
+                {
+                    ai1.Money += voittopotti;
+                    ai1.Action = 8;
+                    ai2.Action = 9;
+                    ai3.Action = 9;
+                    player.Action = 9;
+                }
+                if (ai2.winner == 1 && ai2.Fold == false)
+                {
+                    ai2.Money += voittopotti;
+                    ai2.Action = 8;
+                    ai1.Action = 9;
+                    ai3.Action = 9;
+                    player.Action = 9;
+                }
+                if (ai3.winner == 1 && ai3.Fold == false)
+                {
+                    ai3.Money += voittopotti;
+                    ai3.Action = 8;
+                    player.Action = 9;
+                    ai1.Action = 9;
+                    ai2.Action = 9;
+                }
+
+                tablePlayer.Money = 0;
+            }
+            endgame = true;
+            DisableButtons();
+            StartGame.IsEnabled = true;
+            StartGame.Visibility = Visibility.Visible;
+            turnCounter = 0;
+            UpdateUI();
+        }
+
+        private void Fold_Click(object sender, RoutedEventArgs e)
+        {
+            player.Fold = true;
+            DisableButtons();
+            UpdateUI();
+            StartTurn();
+        }
+        public void BuildCanvas()
+        {
             kortti1 = new Kortti // lisätään kortti canvakselle
             {
                 Suit = card1.Suit,
@@ -351,511 +798,178 @@ namespace Pokeri
             MyCanvas.Children.Add(tableCard3);
             MyCanvas.Children.Add(tableCard4);
             MyCanvas.Children.Add(tableCard5);
+        }
 
-            player.Action = 2;
-            UpdateUI();            
-            DisableButtons();
-    }
+        public void RemoveCanvas()
+        {
+            /*
+            MyCanvas.Children.Remove(kortti1);
+            MyCanvas.Children.Remove(kortti2);
+            MyCanvas.Children.Remove(ai1Card1);
+            MyCanvas.Children.Remove(ai1Card2);
+            MyCanvas.Children.Remove(ai2Card1);
+            MyCanvas.Children.Remove(ai2Card2);
+            MyCanvas.Children.Remove(ai3Card1);
+            MyCanvas.Children.Remove(ai3Card2);
+            MyCanvas.Children.Remove(tableCard1);
+            MyCanvas.Children.Remove(tableCard2);
+            MyCanvas.Children.Remove(tableCard3);
+            MyCanvas.Children.Remove(tableCard4);
+            MyCanvas.Children.Remove(tableCard5);
+            */
 
-        private void Reveal_Click(object sender, RoutedEventArgs e)
-        {            
+            MyCanvas.Children.Clear();
+        }
+        public void AddCards()
+        {
+            card1 = new Card(); // ei kaunis, kehittelen loopin jos aikaa
+            card2 = new Card();
+            card3 = new Card();
+            card4 = new Card();
+            card5 = new Card();
+            card6 = new Card();
+            card7 = new Card();
+            card8 = new Card();
+            card9 = new Card();
+            card10 = new Card();
+            card11 = new Card();
+            card12 = new Card();
+            card13 = new Card();
+
+            card1 = deck.ServeCard();
+            card2 = deck.ServeCard();
+            card3 = deck.ServeCard();
+            card4 = deck.ServeCard();
+            card5 = deck.ServeCard();
+            card6 = deck.ServeCard();
+            card7 = deck.ServeCard();
+            card8 = deck.ServeCard();
+            card9 = deck.ServeCard();
+            card10 = deck.ServeCard();
+            card11 = deck.ServeCard();
+            card12 = deck.ServeCard();
+            card13 = deck.ServeCard();
+
+            playerHand.AddCard(card1);
+            playerHand.AddCard(card2);
+            ai1Hand.AddCard(card3);
+            ai1Hand.AddCard(card4);
+            ai2Hand.AddCard(card5);
+            ai2Hand.AddCard(card6);
+            ai3Hand.AddCard(card7);
+            ai3Hand.AddCard(card8);
+            table.AddCard(card9);
+            table.AddCard(card10);
+            table.AddCard(card11);
+            table.AddCard(card12);
+            table.AddCard(card13);
+        }
+
+        public void NewGame()
+        {
+            playerHand.RemoveCards();
+            ai1Hand.RemoveCards();
+            ai2Hand.RemoveCards();
+            ai3Hand.RemoveCards();
+            table.RemoveCards();
+            deck.RemoveDeck();
+            RemoveCanvas();
+            deck.BuildDeck(card);
+            AddCards();
+            BuildCanvas();
+
+            counter = 0;
+            turnCounter = 0;
+            if (player.Money > 0) player.Fold = false;
+            else
+            {
+                playerActionTextBlock.Text = "You Lost the Game! Good Job!";
+                timer.Stop();
+                DisableButtons();                
+            }
+
+            if (ai1.Money > 0) ai1.Fold = false;
+            else ai1.Fold = true;
+
+            if (ai2.Money > 0) ai2.Fold = false;
+            else ai2.Fold = true;
+
+            if (ai3.Money > 0) ai3.Fold = false;
+            else ai3.Fold = true;
+
+            endgame = false;
+            phase1 = false;
+            phase2 = false;
+            phase3 = false;
+            IsAllIn = false;
+
+            CallValue = 5;
+
+        }
+
+        private void AllIn_Click(object sender, RoutedEventArgs e)
+        {
+            int AllinValue = 0;
+            IsAllIn = true;
+
+            AllinValue = player.Money;
+            if (ai1.Money < AllinValue) AllinValue = ai1.Money;
+            if (ai2.Money < AllinValue) AllinValue = ai2.Money;
+            if (ai3.Money < AllinValue) AllinValue = ai3.Money;
+
+            player.Money -= AllinValue;
+            tablePlayer.Money += AllinValue;            
+
+            if (ai1.GoForAllIn() == true)
+            {
+                ai1.Money -= AllinValue;
+                tablePlayer.Money += AllinValue;
+            }
+            else
+            {
+                ai1.Fold = true;
+            }
+            if (ai2.GoForAllIn() == true)
+            {
+                ai2.Money -= AllinValue;
+                tablePlayer.Money += AllinValue;
+            }
+            else
+            {
+                ai2.Fold = true;
+            }
+            if (ai3.GoForAllIn() == true)
+            {
+                ai3.Money -= AllinValue;
+                tablePlayer.Money += AllinValue;
+            }
+            else
+            {
+                ai3.Fold = true;
+            }
+            AddCardsToHands();
+        }
+        public void AddCardsToHands()
+        {
+            timer.Stop();
             foreach (Kortti kortti in MyCanvas.Children)
             {
                 kortti.Hidden = false;
-                kortti.UpdateLooks();
-                kortti.UpdatePosition();
-            }
-        }
-        public void UpdateUI()
-        {
-
-            PlayerCash = Convert.ToString(player.Money);
-            Ai1Cash = Convert.ToString(ai1.Money);
-            Ai2Cash = Convert.ToString(ai2.Money);
-            Ai3Cash = Convert.ToString(ai3.Money);
-            TableCash = Convert.ToString(tablePlayer.Money);
-
-            playerNameGamePage.Text = player.Name;
-            playerMoneyGamePage.Text = PlayerCash + " $";
-            ai1MoneyGamePage.Text = Ai1Cash + " $";
-            ai2MoneyGamePage.Text = Ai2Cash + " $";
-            ai3MoneyGamePage.Text = Ai3Cash + " $";
-            tableMoneyGamePage.Text = TableCash + " $";
-            ai1.GetCallValue(CallValue);
-            ai2.GetCallValue(CallValue);
-            ai3.GetCallValue(CallValue);
-            CallValueTextBlock.Text = "Call Value: " + Convert.ToString(CallValue);
-
-            foreach (Kortti kortti in MyCanvas.Children)
-            {
-                kortti.UpdateLooks();
-                kortti.UpdatePosition();
             }
 
-            switch (player.Action)
-            {
-                case 0: playerActionTextBlock.Text = "Call! " + CallValue + " $"; break;
-                case 1: playerActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
-                case 2: playerActionTextBlock.Text = "Start Game!"; break;
-                case 3: playerActionTextBlock.Text = "Your Turn!"; break;
-                case 5: playerActionTextBlock.Text = "Not Your Turn! "; break;
-                case 7: playerActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
-                case 8: playerActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
-                case 9: playerActionTextBlock.Text = "Loser! "; break;
-            }
-
-            switch (ai1.Action)
-            {
-                case 0: ai1ActionTextBlock.Text = "Call! " + CallValue + " $"; break;
-                case 1: ai1ActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
-                case 5: ai1ActionTextBlock.Text = "Waiting..."; break;
-                case 7: ai1ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
-                case 8: ai1ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
-                case 9: ai1ActionTextBlock.Text = "Loser! "; break;
-            }
-            switch (ai2.Action)
-            {
-                case 0: ai2ActionTextBlock.Text = "Call! " + CallValue + " $"; break;
-                case 1: ai2ActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
-                case 5: ai2ActionTextBlock.Text = "Waiting..."; break;
-                case 7: ai2ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
-                case 8: ai2ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
-                case 9: ai2ActionTextBlock.Text = "Loser! "; break;
-            }
-            switch (ai3.Action)
-            {
-                case 0: ai3ActionTextBlock.Text = "Call! " + CallValue + " $"; break;
-                case 1: ai3ActionTextBlock.Text = "Raise! " + CallValue + " $"; break;
-                case 5: ai3ActionTextBlock.Text = "Waiting..."; break;
-                case 7: ai3ActionTextBlock.Text = "Draw! +" + voittopotti + " $"; break;
-                case 8: ai3ActionTextBlock.Text = "Winner! +" + voittopotti + " $"; break;
-                case 9: ai3ActionTextBlock.Text = "Loser! "; break;
-            }
-            if (turnCounter == 3)
-            {
-                tableCard1.Hidden = false;
-                tableCard2.Hidden = false;
-                tableCard3.Hidden = false;
-                AddCardsToHandPhase1();
-                //GetHandValues();
-                DebugShowHands();
-                ValuesDebug();
-            }
-            if (turnCounter == 5)
-            {
-                tableCard4.Hidden = false;
-                AddCardsToHandPhase2();
-                //GetHandValues();
-                DebugShowHands();
-                ValuesDebug();
-            }
-            if (turnCounter == 6)
-            {
-                tableCard5.Hidden = false;
-                AddCardsToHandPhase3();
-                //GetHandValues();
-                DebugShowHands();
-                ValuesDebug();
-            }
-            if (turnCounter == 7)
-            {
-                ai1Card1.Hidden = false;
-                ai1Card2.Hidden = false;
-                ai2Card1.Hidden = false;
-                ai2Card2.Hidden = false;
-                ai3Card1.Hidden = false;
-                ai3Card2.Hidden = false;
-                if (endgame == false)
-                {
-                    EndGame();
-                }
-                timer.Stop();  
-            }
-
-        }
-
-        private void Hide_Click(object sender, RoutedEventArgs e)
-        {
-            ai1Card1.Hidden = true;
-            ai1Card2.Hidden = true;
-            ai2Card1.Hidden = true;
-            ai2Card2.Hidden = true;
-            ai3Card1.Hidden = true;
-            ai3Card2.Hidden = true;
-            tableCard1.Hidden = true;
-            tableCard2.Hidden = true;
-            tableCard3.Hidden = true;
-            tableCard4.Hidden = true;
-            tableCard5.Hidden = true;
-
-            foreach (Kortti kortti in MyCanvas.Children)
-            {
-                kortti.UpdateLooks();
-                kortti.UpdatePosition();
-            }
-        }
-        public void AddCardsToHandPhase1() // lisätään pöydässä olevat kortit pelaajien käteen käden laskua ja tekoälyn toimintaa varten
-        {
             if (phase1 == false)
             {
-                playerHand.AddCard(card9);
-                playerHand.AddCard(card10);
-                playerHand.AddCard(card11);
-
-                ai1Hand.AddCard(card9);
-                ai1Hand.AddCard(card10);
-                ai1Hand.AddCard(card11);
-
-                ai2Hand.AddCard(card9);
-                ai2Hand.AddCard(card10);
-                ai2Hand.AddCard(card11);
-
-                ai3Hand.AddCard(card9);
-                ai3Hand.AddCard(card10);
-                ai3Hand.AddCard(card11);
-
-                phase1 = true;
+                AddCardsToHandPhase1();
             }
-        }
-
-        public void AddCardsToHandPhase2()
-        {
             if (phase2 == false)
             {
-                playerHand.AddCard(card12);
-
-                ai1Hand.AddCard(card12);
-
-                ai2Hand.AddCard(card12);
-
-                ai3Hand.AddCard(card12);
-
-                phase2 = true;
+                AddCardsToHandPhase2();
             }
-        }
-
-
-        public void AddCardsToHandPhase3()
-        {
             if (phase3 == false)
             {
-                playerHand.AddCard(card13);
-
-                ai1Hand.AddCard(card13);
-
-                ai2Hand.AddCard(card13);
-
-                ai3Hand.AddCard(card13);
-
-                phase3 = true;
+                AddCardsToHandPhase3();
             }
-        }
-
-        public void GetHandValues()
-        {
-            player.HandValue = playerHand.GetHandValues();
-            ai1.HandValue = ai1Hand.GetHandValues();
-            ai2.HandValue = ai2Hand.GetHandValues();
-            ai3.HandValue = ai3Hand.GetHandValues();
-        }
-
-        public void StartGame_Click(object sender, RoutedEventArgs e)
-        {
-            if (endgame == false)
-            {
-                kortti1.Hidden = false;
-                kortti2.Hidden = false;
-
-                player.Money -= 5;
-                ai1.Money -= 5;
-                ai2.Money -= 5;
-                ai3.Money -= 5;
-                tablePlayer.Money += 20;
-                UpdateUI();
-                StartGame.IsEnabled = false;
-                StartGame.Visibility = Visibility.Collapsed;
-                StartTurn();
-            }
-             else
-            {
-                Data data = new Data();
-                data.player = player.Money;
-                data.ai1 = ai1.Money;
-                data.ai2 = ai2.Money;
-                data.ai3 = ai3.Money;
-                this.Frame.Navigate(typeof(LoadingPage), data);
-                
-            }
-            
-        }
-        private void Timer_Tick(object sender, object e)
-        {
-            int rv = 0; //return value from methods, how much money ai will spend
-            UpdateUI();
-            counter++;
-            if (counter >= 4)
-            {
-                turnCounter++;
-                if (player.Fold == true)
-                {
-                    counter = 0;
-                    UpdateUI();
-                }
-                else
-                {
-                    if (turnCounter == 7)
-                    {
-                        timer.Stop();
-                        DisableButtons();
-                        UpdateUI();
-                    }
-                    else
-                    {
-                        ai1.Action = 5;
-                        ai2.Action = 5;
-                        ai3.Action = 5;
-                        player.Action = 3;
-                        UpdateUI();
-                        EnableButtons();
-                        timer.Stop();
-                        counter = 0;
-                    }
-                }
-                    
-            }
-            if (counter == 1)
-            {            
-                ai2.Action = 5;
-                ai3.Action = 5;
-                player.Action = 5;
-                UpdateUI();
-                rv = ai1.AiTurn(ai1Hand);
-                tablePlayer.Money += rv;
-                if (ai1.Action == 1)
-                {
-                    CallValue = ai1.ReturnNewCallValue();
-                    UpdateUI();
-                }
-                UpdateUI();
-            }
-            if (counter == 2)
-            {
-                ai1.Action = 5;
-                ai3.Action = 5;
-                player.Action = 5;
-                UpdateUI();
-                rv = ai2.AiTurn(ai2Hand);
-                tablePlayer.Money += rv;
-                if(ai2.Action == 1)
-                {
-                    CallValue = ai2.ReturnNewCallValue();
-                    UpdateUI();
-                }
-                UpdateUI();
-            }
-            if (counter == 3)
-            {
-                ai2.Action = 5;
-                ai1.Action = 5;
-                player.Action = 5;
-                rv = ai3.AiTurn(ai3Hand);
-                tablePlayer.Money += rv;
-                UpdateUI();
-                if (ai3.Action == 1)
-                {
-                    CallValue = ai3.ReturnNewCallValue();
-                    UpdateUI();
-                }
-                UpdateUI();       
-            }            
-        }
-
-        private void Call_Click(object sender, RoutedEventArgs e)
-        {
-            player.Action = 0;
-            DisableButtons();
-            player.Money -= CallValue;
-            tablePlayer.Money += CallValue;
-            UpdateUI();
-            StartTurn();
-        }
-        private void DisableButtons()
-        {
-            Call.IsEnabled = false;
-            Raise.IsEnabled = false;
-            Fold.IsEnabled = false;
-        }
-        private void EnableButtons()
-        {
-            Call.IsEnabled = true;
-            Raise.IsEnabled = true;
-            Fold.IsEnabled = true;
-        }
-
-        private void Raise_Click(object sender, RoutedEventArgs e)
-        {
-            player.Action = 1;
-            DisableButtons();
-            CallValue += 5;
-            player.Money -= CallValue;
-            tablePlayer.Money += CallValue;
-            UpdateUI();
-            StartTurn();
-                            
-         }
-
-        public void DebugShowHands()
-        {
-            Debug.WriteLine("Player hand:");
-            playerHand.ShowHands();
-            Debug.WriteLine("AI1 hand:");
-            ai1Hand.ShowHands();
-            Debug.WriteLine("AI2 hand:");
-            ai2Hand.ShowHands();
-            Debug.WriteLine("AI3 hand:");
-            ai3Hand.ShowHands();
-            Debug.WriteLine("Table hand:");
-            table.ShowHands();
-        }
-
-        public void ValuesDebug()
-        {
-            int Cardvalue = playerHand.GetHandValues();
-            Debug.WriteLine("Käden arvo: " + Cardvalue);
-            int Cardvalue1 = ai1Hand.GetHandValues();
-            Debug.WriteLine("Käden arvo: " + Cardvalue1);
-            int Cardvalue2 = ai2Hand.GetHandValues();
-            Debug.WriteLine("Käden arvo: " + Cardvalue2);
-            int Cardvalue3 = ai3Hand.GetHandValues();
-            Debug.WriteLine("Käden arvo: " + Cardvalue3);
-        }
-
-        public void EndGame()
-        {
-            GetHandValues();
-            int v = 0;
-            int j = 0;
-            voittopotti = 0;
-
-            v = player.HandValue;
-            if (ai1.HandValue > v) v = ai1.HandValue;
-            if (ai2.HandValue > v) v = ai2.HandValue;
-            if (ai3.HandValue > v) v = ai3.HandValue;
-
-            if (v == player.HandValue)
-            {
-                player.winner = 1;
-                j++;
-            }
-            if (v == ai1.HandValue)
-            {
-                ai1.winner = 1;
-                j++;
-            }
-            if (v == ai2.HandValue)
-            {
-                ai2.winner = 1;
-                j++;
-            }
-            if (v == ai3.HandValue)
-            {
-                ai3.winner = 1;
-                j++;
-            }
-
-            if (j > 1)
-            {
-                voittopotti = tablePlayer.Money / j;
-
-                if (player.winner == 1 && player.Fold == false)
-                {
-                    player.Money += voittopotti;
-                    player.Action = 7;
-
-                    if (ai1.winner != 1) ai1.Action = 9;
-                    if (ai2.winner != 1) ai2.Action = 9;
-                    if (ai3.winner != 1) ai3.Action = 9;
-
-                }
-                if (ai1.winner == 1 && ai1.Fold == false)
-                {
-                    ai1.Money += voittopotti;
-                    ai1.Action = 7;
-                    if (player.winner != 1) player.Action = 9;
-                    if (ai2.winner != 1) ai2.Action = 9;
-                    if (ai3.winner != 1) ai3.Action = 9;
-                }
-                if (ai2.winner == 1 && ai2.Fold == false)
-                {
-                    ai2.Money += voittopotti;
-                    ai2.Action = 7;
-                    if (player.winner != 1) player.Action = 9;
-                    if (ai1.winner != 1) ai1.Action = 9;
-                    if (ai3.winner != 1) ai3.Action = 9;
-                }
-                if (ai3.winner == 1 && ai3.Fold == false)
-                {
-                    ai3.Money += voittopotti;
-                    ai3.Action = 7;
-                    if (player.winner != 1) player.Action = 9;
-                    if (ai2.winner != 1) ai2.Action = 9;
-                    if (ai1.winner != 1) ai1.Action = 9;
-                }
-                tablePlayer.Money = 0;
-
-            }
-            if (j == 1)
-            {
-                voittopotti = tablePlayer.Money;
-                if (player.winner == 1 && player.Fold == false)
-                {                    
-                    player.Money += voittopotti;
-                    player.Action = 8;
-                    ai1.Action = 9;
-                    ai2.Action = 9;
-                    ai3.Action = 9;
-                }
-                if (ai1.winner == 1 && ai1.Fold == false)
-                {
-                    ai1.Money += voittopotti;
-                    ai1.Action = 8;
-                    ai2.Action = 9;
-                    ai3.Action = 9;
-                    player.Action = 9;
-                }
-                if (ai2.winner == 1 && ai2.Fold == false)
-                {
-                    ai2.Money += voittopotti;
-                    ai2.Action = 8;
-                    ai1.Action = 9;
-                    ai3.Action = 9;
-                    player.Action = 9;
-                }
-                if (ai3.winner == 1 && ai3.Fold == false)
-                {
-                    ai3.Money += voittopotti;
-                    ai3.Action = 8;
-                    player.Action = 9;
-                    ai1.Action = 9;
-                    ai2.Action = 9;
-                }
-
-                tablePlayer.Money = 0;
-            }
-            endgame = true;
-            DisableButtons();
-            StartGame.IsEnabled = true;
-            StartGame.Visibility = Visibility.Visible;
-            turnCounter = 0;
-            UpdateUI();
-        }
-
-        private void Fold_Click(object sender, RoutedEventArgs e)
-        {
-            player.Fold = true;
-            DisableButtons();
-            UpdateUI();
-            StartTurn();
+            EndGame();
         }
     }
 

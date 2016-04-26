@@ -93,5 +93,10 @@ namespace Pokeri
                 Debug.WriteLine(card.Suit + " " + card.Number);
             }
         }
+        public void RemoveDeck()
+        {
+            deck.Clear();
+        }
+
     }
 }
