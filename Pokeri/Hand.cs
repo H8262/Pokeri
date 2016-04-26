@@ -37,9 +37,10 @@ namespace Pokeri
             if (Vari() == true) return 7;
             if (Suora() == true) return 6;
             if (Kolmoset() == true) return 5;
-            if (KaksiParia() == true) return 4;
-            if (Pari() == true) return 3;
-            else return 0;
+            if (KolmeParia() == true) return 4;
+            if (KaksiParia() == true) return 3;
+            if (Pari() == true) return 2;
+            else return 1;
         }
 
         public bool Suora()
@@ -48,30 +49,30 @@ namespace Pokeri
             int h = 0;
             int k = 0;
             int z = 0;
+            int y = 0;
             int f = hand.Count;
 
             for (int i = 0; i < f; i++)
-            {                
+            {
+                y = 1;
+                z = 0;
                 Card card = hand.ElementAt(i);
                 h = card.Number;
-                for (int g = 0; g < f; g++)
-                {
-                    Card card1 = hand.ElementAt(g);
-                    if (card != card1)
+                    for (int g = 0; g < f; g++)
                     {
-                        k = card1.Number;
-                        if (h == k)
+                        Card card1 = hand.ElementAt(g);
+                        if (card != card1)
                         {
-                            z--;
+                            k = card1.Number;
+                            if(k == h + y)
+                            {
+                                z++;
+                                y++;
+                                g = 0;
+                            }
                         }
-
-                        if (h + 1 == k)
-                        {
-                            z++;
-                        }
+                        if (z >= 4) return true;
                     }
-                    if (z >= 4) return true;
-                }
             }
                 return false;
         }
@@ -307,6 +308,37 @@ namespace Pokeri
             }
             */
             hand.Clear();
+        }
+
+        public bool KolmeParia()
+        {
+            int h = 0;
+            int k = 0;
+            int z = 0;
+            int f = hand.Count;
+            int j = 0;
+
+            for (int i = 0; i < f; i++)
+            {
+                z = 0;
+                Card card = hand.ElementAt(i);
+                h = card.Number;
+                for (int g = 0; g < hand.Count; g++)
+                {
+                    Card card1 = hand.ElementAt(g);
+
+                    if (card != card1)
+                    {
+                        k = card1.Number;
+                        if (h == k)
+                        {
+                            j++;
+                        }
+                    }
+                }
+            }
+            if (j == 6) return true;
+            return false;
         }
     }
 }
