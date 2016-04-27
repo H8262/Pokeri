@@ -24,7 +24,7 @@ namespace Pokeri
     /// </summary>
     public sealed partial class GamePage : Page
     {                
-        string PlayerCash;
+        string PlayerCash; // sijoitetaan textblockeihin
         string Ai1Cash;
         string Ai2Cash;
         string Ai3Cash;
@@ -103,7 +103,7 @@ namespace Pokeri
                 = ApplicationViewWindowingMode.PreferredLaunchViewSize;
             ApplicationView.PreferredLaunchViewSize = new Size(800, 600);
 
-                player = new Player { Name = "Player", Money = 200 };
+                player = new Player { Name = "Player", Money = 200 }; // pelaajien alustus
                 ai1 = new Player { Name = "AI Player 1", Money = 200 };
                 ai2 = new Player { Name = "AI Player 2", Money = 200 };
                 ai3 = new Player { Name = "AI Player 3", Money = 200 };
@@ -124,7 +124,6 @@ namespace Pokeri
             table = new Hand(); // pöydän kortit
 
             deck.BuildDeck(card);
-
 
             deck.DebugList();
 
@@ -175,7 +174,7 @@ namespace Pokeri
 
     }
 
-        private void Reveal_Click(object sender, RoutedEventArgs e)
+        private void Reveal_Click(object sender, RoutedEventArgs e) // Debuggaukseen käytetty namiska joka näyttää kaikki kortit
         {            
             foreach (Kortti kortti in MyCanvas.Children)
             {
@@ -187,24 +186,24 @@ namespace Pokeri
         public void UpdateUI()
         {
 
-            PlayerCash = Convert.ToString(player.Money);
+            PlayerCash = Convert.ToString(player.Money); // sijoitetaan pelaajan rahamäärä str muuttujaan
             Ai1Cash = Convert.ToString(ai1.Money);
             Ai2Cash = Convert.ToString(ai2.Money);
             Ai3Cash = Convert.ToString(ai3.Money);
             TableCash = Convert.ToString(tablePlayer.Money);
 
             playerNameGamePage.Text = player.Name;
-            playerMoneyGamePage.Text = PlayerCash + " $";
+            playerMoneyGamePage.Text = PlayerCash + " $"; // sijoitetaa str muuttuja pelaajan näkösille
             ai1MoneyGamePage.Text = Ai1Cash + " $";
             ai2MoneyGamePage.Text = Ai2Cash + " $";
             ai3MoneyGamePage.Text = Ai3Cash + " $";
             tableMoneyGamePage.Text = TableCash + " $";
-            ai1.GetCallValue(CallValue);
+            ai1.GetCallValue(CallValue); // päivitetään AI pelaajien CallValuet
             ai2.GetCallValue(CallValue);
             ai3.GetCallValue(CallValue);
             CallValueTextBlock.Text = "Call Value: " + Convert.ToString(CallValue);
 
-            foreach (Kortti kortti in MyCanvas.Children)
+            foreach (Kortti kortti in MyCanvas.Children) // päivitetään korttien ulkonäkö ja sijainti.
             {
                 kortti.UpdateLooks();
                 kortti.UpdatePosition();
@@ -256,19 +255,19 @@ namespace Pokeri
                 case 12: ai3ActionTextBlock.Text = "Drinking heavily!"; break;
             }
 
-            GetHandValues();           
+            GetHandValues();           // haetaan käsien arvot
 
-            if (turnCounter == 3)
+            if (turnCounter == 3) // näytetään 3 ekaa korttia
             {
                 tableCard1.Hidden = false;
                 tableCard2.Hidden = false;
                 tableCard3.Hidden = false;
-                AddCardsToHandPhase1();
+                AddCardsToHandPhase1(); // lisätään kortit pelaajien käsiin että AI "osaa" tehdä parempia päätöksiä
                 //GetHandValues();
                 DebugShowHands();
                 ValuesDebug();
             }
-            if (turnCounter == 5)
+            if (turnCounter == 5) // näytetään neljäs kortti
             {
                 tableCard4.Hidden = false;
                 AddCardsToHandPhase2();
@@ -276,7 +275,7 @@ namespace Pokeri
                 DebugShowHands();
                 ValuesDebug();
             }
-            if (turnCounter == 6)
+            if (turnCounter == 6) // näytetään viimeinen kortti
             {
                 tableCard5.Hidden = false;
                 AddCardsToHandPhase3();
@@ -284,7 +283,7 @@ namespace Pokeri
                 DebugShowHands();
                 ValuesDebug();
             }
-            if (turnCounter == 7)
+            if (turnCounter == 7) // peli päättyy
             {
                 ai1Card1.Hidden = false;
                 ai1Card2.Hidden = false;
@@ -300,7 +299,7 @@ namespace Pokeri
             }
         }
 
-        private void Hide_Click(object sender, RoutedEventArgs e)
+        private void Hide_Click(object sender, RoutedEventArgs e) // sama tarkoitus kun reveal napilla
         {
             ai1Card1.Hidden = true;
             ai1Card2.Hidden = true;
@@ -381,7 +380,7 @@ namespace Pokeri
         {
             player.HandValue = playerHand.GetHandValues();
 
-            if (ai1.Lost == false && ai1.Fold == false)
+            if (ai1.Lost == false && ai1.Fold == false) // jos ai on foldannut tai hävinnyt ei lasketa arvoja
             {
                 ai1.HandValue = ai1Hand.GetHandValues();
             }
@@ -455,13 +454,13 @@ namespace Pokeri
             int rv = 0; //return value from methods, how much money ai will spend
             UpdateUI();
             counter++;
-            if(FoldCounter == PlayerCount - 1)
+            if(FoldCounter == PlayerCount - 1) // jos on jäljellä vain yksi pelaaja, peli päättyy
             {
                 timer.Stop();
                 AddCardsToHands();
                 UpdateUI();
             }
-            if (counter >= 4)
+            if (counter >= 4) // pelaajan vuoro
             {
                 turnCounter++;
                 if (player.Fold == true)
@@ -491,26 +490,26 @@ namespace Pokeri
                 }
                     
             }
-            if (counter == 1)
+            if (counter == 1) // ai1 vuoro
             {
-                if (ai1.Fold == false)
+                if (ai1.Fold == false) // onko foldannut
                 {
-                    if (ai1.Lost == false)
+                    if (ai1.Lost == false) // onko hävinnyt
                     {
-                        ai2.Action = 5;
+                        ai2.Action = 5; // muut pelaajat odottavat kiltisti
                         ai3.Action = 5;
                         player.Action = 5;
                         UpdateUI();
-                        rv = ai1.AiTurn(ai1Hand);
-                        if(ai1.Action == 3)
+                        rv = ai1.AiTurn(ai1Hand); // haetaan paljonko rahaa AI laittaa peliin ja mitä AI aikoo tehdä
+                        if(ai1.Action == 3) // AI foldaa
                         {
                             ai1.Fold = true;
                             FoldCounter++;
                         }
-                        tablePlayer.Money += rv;
-                        if (ai1.Action == 1)
+                        tablePlayer.Money += rv; // listään rahet pöytään
+                        if (ai1.Action == 1) // AI nostaa pottia
                         {
-                            CallValue = ai1.ReturnNewCallValue();
+                            CallValue = ai1.ReturnNewCallValue(); // haetaan AI:lta uusi CallValue
                             UpdateUI();
                         }
                     }
@@ -519,7 +518,7 @@ namespace Pokeri
                 else ai1.Action = 3;
                 UpdateUI();
             }
-            if (counter == 2)
+            if (counter == 2) // ai2 vuoro
             {
                 if (ai2.Fold == false)
                 {
@@ -547,7 +546,7 @@ namespace Pokeri
                 else ai2.Action = 3;
                 UpdateUI();
             }
-            if (counter == 3)
+            if (counter == 3) // ai3 vuoro
             {
                 if (ai3.Fold == false)
                 {
@@ -577,7 +576,7 @@ namespace Pokeri
             }            
         }
 
-        private void Call_Click(object sender, RoutedEventArgs e)
+        private void Call_Click(object sender, RoutedEventArgs e) // pelaaja Call
         {
             player.Action = 0;
             DisableButtons();
@@ -586,7 +585,7 @@ namespace Pokeri
             UpdateUI();
             StartTurn();
         }
-        private void DisableButtons()
+        private void DisableButtons() // napit otetan pois käytöstä
         {
             Call.IsEnabled = false;
             Raise.IsEnabled = false;
@@ -609,7 +608,7 @@ namespace Pokeri
             }
         }
 
-        private void Raise_Click(object sender, RoutedEventArgs e)
+        private void Raise_Click(object sender, RoutedEventArgs e) // pelaaja nostaa pottia
         {
             player.Action = 1;
             DisableButtons();
@@ -648,7 +647,7 @@ namespace Pokeri
             Debug.WriteLine("Käden arvo: " + Cardvalue3);
         }
 
-        public void EndGame()
+        public void EndGame() // vertaillaan käsien arvoja
         {
             GetHandValues();
             if (ai1.Fold == true || ai1.Lost == true) ai1.HandValue = 0;
@@ -659,17 +658,17 @@ namespace Pokeri
             int j = 0;
             voittopotti = tablePlayer.Money;
 
-            player.Action = 9;
+            player.Action = 9; // kaikki on luusereita ennenkuin toisin todistetaan
             ai1.Action = 9;
             ai2.Action = 9;
             ai3.Action = 9;
 
             v = player.HandValue;
-            if (ai1.HandValue > v) v = ai1.HandValue;
+            if (ai1.HandValue > v) v = ai1.HandValue; // haetaan mikä on suurin käden arvo
             if (ai2.HandValue > v) v = ai2.HandValue;
             if (ai3.HandValue > v) v = ai3.HandValue;
 
-            if (v == player.HandValue)
+            if (v == player.HandValue) // vertaillaan kenellä se arvo on
             {
                 player.winner = 1;
                 j++;
@@ -690,7 +689,7 @@ namespace Pokeri
                 j++;
             }
 
-            if (j > 1)
+            if (j > 1) // jos usealla oli sama käden arvo --> tasapeli
             {
                 voittopotti = voittopotti / j;
 
@@ -1072,9 +1071,9 @@ namespace Pokeri
             IsAllIn = true;
 
             AllinValue = player.Money;
-            if (ai1.Money < AllinValue) AllinValue = ai1.Money;
-            if (ai2.Money < AllinValue) AllinValue = ai2.Money;
-            if (ai3.Money < AllinValue) AllinValue = ai3.Money;
+            if (ai1.Lost == false && ai1.Money < AllinValue) AllinValue = ai1.Money;
+            if (ai2.Lost == false && ai2.Money < AllinValue) AllinValue = ai2.Money;
+            if (ai3.Lost == false && ai3.Money < AllinValue) AllinValue = ai3.Money;
 
             player.Money -= AllinValue;
             tablePlayer.Money += AllinValue;            
@@ -1131,7 +1130,7 @@ namespace Pokeri
             EndGame();
         }
 
-        public void LowerAiWill()
+        public void LowerAiWill() // alennetaan AI:n tahtoa
         {
 
             ai1.AiVariable -= 5;

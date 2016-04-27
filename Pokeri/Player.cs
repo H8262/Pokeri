@@ -12,8 +12,8 @@ namespace Pokeri
         public int Money;
         public int Action = 5; // shows what action AI takes to player 0 = call etc. 5 = Waiting...       
         public int CallValue;
-        public int AiVariable = 75; // 0 - 66 values = Ai will call
-        public int AiVariable2 = 25;  // 0 -5 fold, 6 - 66 call, 67 - 94 Raise, 95 - 100 All In 
+        public int AiVariable = 75; // arvot joiden väliltä Random lasketaan
+        public int AiVariable2 = 25;  //  Käden laskettu arvo muuttaa tätä väliä
         public int HandValue = 0;
         public int winner = 0; // 0 = loser, 1 = winner, 2 = draw
         public bool Fold = false; // has player folded?
@@ -23,7 +23,7 @@ namespace Pokeri
 
         public int AiTurn(Hand hand)
         {
-            if(HandValue >= 2)
+            if(HandValue >= 2) // jos AI näkee ainakin parin
             {
                 AiVariable = 75;
                 AiVariable2 = 25;
@@ -35,7 +35,7 @@ namespace Pokeri
                 if (AiVariable > 100) AiVariable = 100;
                 if (AiVariable2 > 90) AiVariable2 = 90;
             }
-            if(HandValue == 1)
+            if(HandValue == 1) // jos kädessä ei ole mitään
             {
                 AiVariable -= 5;
                 AiVariable2 -= 5;
@@ -48,9 +48,9 @@ namespace Pokeri
             Random random = new Random();
             rand = random.Next(AiVariable2, AiVariable);
 
-            int ReturnValue = 0; // what amount of goods transfers to the table
+            int ReturnValue = 0; // paljonko rahaa AI palauttaa pöytään
 
-            if (rand >= 0 && rand <= 5)
+            if (rand >= 0 && rand <= 5) // AI luovuttaa
             {
                 Action = 3;
                 ReturnValue = 0;
@@ -78,16 +78,16 @@ namespace Pokeri
 
 
         }
-        public void GetCallValue(int callvalue)
+        public void GetCallValue(int callvalue) // pelaaja hakee nykyisen CallValuen pelistä
         {            
             CallValue = callvalue;
         }
-        public int ReturnNewCallValue()
+        public int ReturnNewCallValue() // pelaaja palauttaa uuden CallValuen
         {
             return CallValue;
         }
 
-        public bool GoForAllIn()
+        public bool GoForAllIn() // aikooko AI mennä ALLIN?!?!?
         {
             Random random = new Random();
             rand = random.Next(AiVariable2, AiVariable);
